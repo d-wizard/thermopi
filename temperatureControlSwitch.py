@@ -470,7 +470,10 @@ def getStatus(): # Returns Dictionary
    elif currentSwitchState != None and currentSwitchState == False:
       switchStateString = "Off"
    
-   status['Temp'] = str(lastTemperatureAverage)
+   try:
+      status['Temp'] = "{:.1f}".format(lastTemperatureAverage)
+   except:
+      status['Temp'] = ""
    status['SwitchState'] = switchStateString
 
    return status
