@@ -8,6 +8,7 @@
         // This code will run every time something happens.
         /////////////////////////////////////////////////////////        
         $pythonScript = "python /home/pi/thermo/getTempChartArray.py";
+        $titleStr = "'Temperature - 1 Day'";
 
         $time = 3600*24;
         $numPoints = 600;
@@ -16,37 +17,58 @@
         {
           $time = 3600;
           $numPoints = 100;
+          $titleStr = "'Temperature - 1 Hr'";
         }
         if(isset($_GET["submit_4hr"]))
         {
           $time = 3600*4;
           $numPoints = 400;
+          $titleStr = "'Temperature - 4 Hrs'";
         }
         if(isset($_GET["submit_12hr"]))
         {
           $time = 3600*12;
           $numPoints = 500;
+          $titleStr = "'Temperature - 12 Hrs'";
         }
         if(isset($_GET["submit_1day"]))
         {
           $time = 3600*24;
           $numPoints = 600;
+          $titleStr = "'Temperature - 1 Day'";
         }
         if(isset($_GET["submit_3day"]))
         {
           $time = 3600*24*3;
           $numPoints = 800;
+          $titleStr = "'Temperature - 3 Days'";
         }
         if(isset($_GET["submit_7day"]))
         {
           $time = 3600*24*7;
           $numPoints = 100*24*7;
+          $titleStr = "'Temperature - 7 Days'";
         }
     ?>
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script type="text/javascript">
       google.charts.load('current', {'packages':['corechart']});
       google.charts.setOnLoadCallback(drawChart);
+
+      var chartW = window.innerWidth;
+      var chartH = window.innerHeight;
+
+      var upperH = Math.floor(chartW/1.1);
+      var lowerH = 300;
+      chartH = chartH - 100;
+
+
+      if (chartH > upperH) {
+        chartH = upperH;
+      }
+      if (chartH < lowerH) {
+        chartH = lowerH;
+      }
 
       function drawChart() {
         var data = google.visualization.arrayToDataTable([
@@ -55,6 +77,8 @@
         ]);
 
         var options = {
+          title: <?php echo $titleStr;?>,
+          titleTextStyle: { fontSize: 20},
           legend: { position: 'bottom' },
           // Gives each series an axis that matches the vAxes number below.
           series: {
@@ -65,7 +89,9 @@
             // Adds titles to each axis.
             1: {ticks: [0,1], textPosition: 'none'},
             0: {title: 'Temperature (°F)', textPosition: 'out'}
-          }
+          },
+          width: chartW,
+          height: chartH
         };
 
         var chart = new google.visualization.LineChart(document.getElementById('curve_chart_with_switch'));
@@ -92,7 +118,7 @@
       <input name="submit_3day" type="submit" value="3 Days" />
       <input name="submit_7day" type="submit" value="7 Days" />
     </form>
-    <div id="curve_chart_with_switch" style="width: 360px; height: 300px"></div>
+    <div id="curve_chart_with_switch"></div>
     </center>
   </body>
 </html>
