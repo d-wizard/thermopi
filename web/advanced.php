@@ -69,6 +69,24 @@
          header("Location: #");
       }
 
+      function getSwitchStateAfter_dropdown()
+      {
+          global $SwitchStateAfterTimeOfDayStop;
+          $selectedVal = $SwitchStateAfterTimeOfDayStop;
+          $validOptions = array('Off', 'On', 'No Change');
+
+          # Generate the dropdown HTML code, making sure the current value is at the top (there is probably a better way to do this).
+          $dropDownHtml = "<option value=".$selectedVal.">".$selectedVal."</option>";
+          for($i = 0; $i < count($validOptions); $i++)
+          {
+             $optStr = $validOptions[$i];
+             if($optStr != $selectedVal)
+             {
+               $dropDownHtml = $dropDownHtml."<option value=".$optStr.">".$optStr."</option>";
+             }
+          }
+          return $dropDownHtml;
+      }
    ?>
    
    <div class="navbar">
@@ -114,7 +132,11 @@
             </tr>
             <tr>
                <td>Switch State After Control Time</td>
-               <td><input name="SwitchStateAfterTimeOfDayStop_val" type="text" value="<?php echo $SwitchStateAfterTimeOfDayStop;?>" /></td>
+               <td>
+                  <select name="SwitchStateAfterTimeOfDayStop_val">
+                     <?php echo getSwitchStateAfter_dropdown();?>
+                  </select>
+               </td>
             </tr>
             <tr>
                <td colspan="2"><center><input name="submit_smart_plug" type="submit" value="Update Smart Plug Settings" /></center></td>
