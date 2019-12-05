@@ -59,7 +59,7 @@
       var chartH = window.innerHeight;
 
       var upperH = Math.floor(chartW/1.1);
-      var lowerH = 300;
+      var lowerH = 200;
       chartH = chartH - 100;
 
 
