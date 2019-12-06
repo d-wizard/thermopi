@@ -72,7 +72,7 @@
 
       function drawChart() {
         var data = google.visualization.arrayToDataTable([
-          ['Time', 'Switch State', 'Temperature (°F)'],
+          [{type: 'datetime', label: 'Time'}, 'Switch State', 'Temperature (°F)'],
           <?php echo shell_exec($pythonScript." -t ".$time." -n ".$numPoints);?>
         ]);
 

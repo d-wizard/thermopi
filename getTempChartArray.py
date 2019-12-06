@@ -132,7 +132,7 @@ def getLinesToChart(lines, numLinesToChart):
    return retVal
 
 def getPrintStr(lines):
-   retStr = ""
+   retStr = ''
    for line in lines:
       try:
          [unixTime, temperature, switchState] = line.split(",")
@@ -142,12 +142,12 @@ def getPrintStr(lines):
          tempInt = int(tempFlt)
          tempStr = str(tempInt) if tempInt == tempFlt else str(tempFlt)
 
-         appendStr = "[new Date(" + timeToPrintStr(unixTime) + ")," + str(int(switchState)) + "," + tempStr + "],"
+         appendStr = '["Date(' + timeToPrintStr(unixTime) + ')",' + str(int(switchState)) + ',' + tempStr + '],'
          retStr += appendStr
       except:
          pass
    
-   if retStr[-1] == ",":
+   if retStr[-1] == ',':
        retStr = retStr[:-1]
    return retStr
 
