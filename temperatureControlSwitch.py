@@ -360,6 +360,14 @@ def safeConvertToStr(convertFunc, inVal, failRetVal = ""):
       pass
    return retVal
 
+def switchStateAfterTimeOfDayStop_toStr(SwitchStateAfterTimeOfDayStop_val):
+   if SwitchStateAfterTimeOfDayStop_val == False:
+      retVal = 'Off'
+   elif SwitchStateAfterTimeOfDayStop_val == True:
+      retVal = 'On'
+   else:
+      retVal = 'No Change'
+   return retVal
 
 def classToDict(settingsClass, settingsDict):
    settingsDict['MinTimeBetweenChangingSwitchState'] = safeConvertToStr(floatToIntStr, settingsClass.MIN_TIME_BETWEEN_CHANGING_SWITCH_STATE)
@@ -379,13 +387,7 @@ def classToDict(settingsClass, settingsDict):
    settingsDict['InvalidTempHigh'] = safeConvertToStr(floatToIntStr, settingsClass.INVALID_TEMPERATURE_HIGH)
    
    # Determine what to set the switch to when entering the time of day to stop controlling the switch.
-   finalSwitchStateStr = settingsClass.SWITCH_STATE_AFTER_TIME_OF_DAY_STOP
-   if finalSwitchStateStr == False:
-      settingsDict['SwitchStateAfterTimeOfDayStop'] = 'Off'
-   elif finalSwitchStateStr == True:
-      settingsDict['SwitchStateAfterTimeOfDayStop'] = 'On'
-   else:
-      settingsDict['SwitchStateAfterTimeOfDayStop'] = 'No Change'
+   settingsDict['SwitchStateAfterTimeOfDayStop'] = switchStateAfterTimeOfDayStop_toStr(settingsClass.SWITCH_STATE_AFTER_TIME_OF_DAY_STOP)
 
 def loadSettingsFromJson():
    global currentTempCtrlSettings
@@ -402,17 +404,20 @@ def loadSettingsFromJson():
 
 def printTempCtrlSettings(tempCtrlSettings):
    try:
+      degreeSign= u'\N{DEGREE SIGN}'
+      timeUnit = " sec"
+      tempUnit = " " + '' + "F"
       # Print in opposite order to make it appear in the correct order in the short log (i.e. last print at top)
-      logMsg("Temp Avg Time           = " + str(tempCtrlSettings.TEMPERATURE_AVERAGE_TIME_AMOUNT))
-      logMsg("Switch State After      = " + str(tempCtrlSettings.SWITCH_STATE_AFTER_TIME_OF_DAY_STOP))
-      logMsg("Invalid Temp High       = " + str(tempCtrlSettings.INVALID_TEMPERATURE_HIGH))
-      logMsg("Invalid Tem Low         = " + str(tempCtrlSettings.INVALID_TEMPERATURE_LOW))
-      logMsg("Temp Check Time         = " + str(tempCtrlSettings.TIME_BETWEEN_TEMPERATURE_CHECK))
-      logMsg("Min Switch Retry Time   = " + str(tempCtrlSettings.MIN_TIME_BETWEEN_RETRYING_SWITCH_CHANGE))
-      logMsg("Min Switch Toggle Time  = " + str(tempCtrlSettings.MIN_TIME_BETWEEN_CHANGING_SWITCH_STATE))
+      logMsg("Temp Avg Time           = " + str(tempCtrlSettings.TEMPERATURE_AVERAGE_TIME_AMOUNT) + timeUnit)
+      logMsg("Switch State After      = " + switchStateAfterTimeOfDayStop_toStr(tempCtrlSettings.SWITCH_STATE_AFTER_TIME_OF_DAY_STOP))
+      logMsg("Invalid Temp High       = " + str(tempCtrlSettings.INVALID_TEMPERATURE_HIGH) + tempUnit)
+      logMsg("Invalid Tem Low         = " + str(tempCtrlSettings.INVALID_TEMPERATURE_LOW)+ tempUnit)
+      logMsg("Temp Check Time         = " + str(tempCtrlSettings.TIME_BETWEEN_TEMPERATURE_CHECK) + timeUnit)
+      logMsg("Min Switch Retry Time   = " + str(tempCtrlSettings.MIN_TIME_BETWEEN_RETRYING_SWITCH_CHANGE) + timeUnit)
+      logMsg("Min Switch Toggle Time  = " + str(tempCtrlSettings.MIN_TIME_BETWEEN_CHANGING_SWITCH_STATE) + timeUnit)
       logMsg("Smart Plug Ip Addr      = " + str(tempCtrlSettings.SMART_PLUG_IP_ADDR))
-      logMsg("Off Temp                = " + str(tempCtrlSettings.SWITCH_OFF_TEMPERATURE))
-      logMsg("On Temp                 = " + str(tempCtrlSettings.SWITCH_ON_TEMPERATURE))
+      logMsg("Off Temp                = " + str(tempCtrlSettings.SWITCH_OFF_TEMPERATURE) + tempUnit)
+      logMsg("On Temp                 = " + str(tempCtrlSettings.SWITCH_ON_TEMPERATURE) + tempUnit)
       logMsg("Stop Time               = " + timeIntToStr(tempCtrlSettings.TIME_OF_DAY_TO_STOP, True))
       logMsg("Start Time              = " + timeIntToStr(tempCtrlSettings.TIME_OF_DAY_TO_START, True))
    except:
