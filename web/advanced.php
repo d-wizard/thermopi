@@ -109,9 +109,10 @@
             <tr>
                <td>Time Between Temp Checks</td>
                <td><input name="TimeBetweenTempCheck_val" type="number" value="<?php echo $TimeBetweenTempCheck;?>" /></td>
+               <td>seconds</td>
             </tr>
             <tr>
-               <td colspan="2"><center><input name="submit_time" type="submit" value="Update Time Settings" /></center></td>
+               <td colspan="3"><center><input name="submit_time" type="submit" value="Update Time Settings" /></center></td>
             </tr>
          </table>
          <br><hr>
@@ -120,26 +121,28 @@
          <table cellpadding="5">
             <tr>
                <td>Smart Plug IP</td>
-               <td><input name="SmartPlugIpAddr_val" type="text" value="<?php echo $SmartPlugIpAddr;?>" /></td>
+               <td colspan="2"><input name="SmartPlugIpAddr_val" type="text" value="<?php echo $SmartPlugIpAddr;?>" /></td>
             </tr>
             <tr>
                <td>Min Switch Toggle Time</td>
                <td><input name="MinTimeBetweenChangingSwitchState_val" type="number" value="<?php echo $MinTimeBetweenChangingSwitchState;?>" /></td>
+               <td>seconds</td>
             </tr>
             <tr>
                <td>Min Switch Retry Time</td>
                <td><input name="MinTimeBetweenRetryingSwitchChange_val" type="number" value="<?php echo $MinTimeBetweenRetryingSwitchChange;?>" /></td>
+               <td>seconds</td>
             </tr>
             <tr>
                <td>Switch State After Control Time</td>
-               <td>
+               <td colspan="2">
                   <select name="SwitchStateAfterTimeOfDayStop_val">
                      <?php echo getSwitchStateAfter_dropdown();?>
                   </select>
                </td>
             </tr>
             <tr>
-               <td colspan="2"><center><input name="submit_smart_plug" type="submit" value="Update Smart Plug Settings" /></center></td>
+               <td colspan="3"><center><input name="submit_smart_plug" type="submit" value="Update Smart Plug Settings" /></center></td>
             </tr>
          </table>
          <br><hr>
@@ -148,14 +151,16 @@
          <table cellpadding="5">
             <tr>
                <td>Min Valid Temp</td>
-               <td><input name="InvalidTempLow_val" type="number" value="<?php echo $InvalidTempLow;?>" /></td>
+               <td width="1"><input name="InvalidTempLow_val" type="number" value="<?php echo $InvalidTempLow;?>" /></td>
+               <td>°F</td>
             </tr>
             <tr>
                <td>Max Valid Temp</td>
-               <td><input name="InvalidTempHigh_val" type="number" value="<?php echo $InvalidTempHigh;?>" /></td>
+               <td width="1"><input name="InvalidTempHigh_val" type="number" value="<?php echo $InvalidTempHigh;?>" /></td>
+               <td>°F</td>
             </tr>
             <tr>
-               <td colspan="2"><center><input name="submit_valid_temp" type="submit" value="Update Valid Temperature Settings" /></center></td>
+               <td colspan="3"><center><input name="submit_valid_temp" type="submit" value="Update Valid Temp Settings" /></center></td>
             </tr>
          </table>
          <br>

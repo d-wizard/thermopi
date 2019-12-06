@@ -1,14 +1,14 @@
 
-input[type='text'] { font-size: 16px; }
-input[type='number'] { font-size: 16px; }
-input[type='time'] { font-size: 16px; }
+input[type='text'] { font-size: 16px; width: 120px; }
+input[type='number'] { font-size: 16px; text-align:right; width: 55px;}
+input[type='time'] { font-size: 16px; width: 110px; }
 input[type='submit'] { font-size: 16px; }
-input[type=number]{ width: 120px; }
-input[type=text]{ width: 120px; }
+select { font-size: 16px; }
 
 body {margin:0;}
 body {font-family: Arial, Helvetica, sans-serif;}
 h1 {font-size: 1.5em;}
+
 
 .navbar {
   overflow: hidden;

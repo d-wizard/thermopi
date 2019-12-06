@@ -69,12 +69,12 @@
             </tr>
             <tr>
                <td>On Temp</td>
-               <td><input name="SwitchOnTemp_val" type="number" width="4" value="<?php echo $SwitchOnTemp;?>" /></td>
+               <td width="1"><input name="SwitchOnTemp_val" type="number" value="<?php echo $SwitchOnTemp;?>" /></td>
                <td>°F</td>
             </tr>
             <tr>
                <td>Off Temp</td>
-               <td><input name="SwitchOffTemp_val" type="number" width="4" value="<?php echo $SwitchOffTemp;?>" /></td>
+               <td width="1"><input name="SwitchOffTemp_val" type="number" value="<?php echo $SwitchOffTemp;?>" /></td>
                <td>°F</td>
             </tr>
             <tr>
