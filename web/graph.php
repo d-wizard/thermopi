@@ -46,7 +46,7 @@
         if(isset($_GET["submit_7day"]))
         {
           $time = 3600*24*7;
-          $numPoints = 100*24*7;
+          $numPoints = 2000;
           $titleStr = "'Temperature - 7 Days'";
         }
     ?>
