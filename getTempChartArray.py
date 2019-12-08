@@ -195,8 +195,10 @@ if __name__== "__main__":
 
    # Process the Temperature Log File
    lockFd = lockFile(TEMPERATURE_LOCK_PATH)
-   lines = readWholeFile(TEMPERATURE_LOG_PATH).split(LOG_NEW_LINE)
+   temperatureLogFile = readWholeFile(TEMPERATURE_LOG_PATH)
    unlockFile(lockFd)
+
+   lines = temperatureLogFile.split(LOG_NEW_LINE)
 
    # remove empty line at end.
    if lines[-1] == "":
