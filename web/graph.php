@@ -115,8 +115,8 @@
       <input name="submit_4hr" type="submit" value="4 Hr" />
       <input name="submit_12hr" type="submit" value="12 Hr" />
       <input name="submit_1day" type="submit" value="1 Day" />
-      <input name="submit_3day" type="submit" value="3 Days" />
-      <input name="submit_7day" type="submit" value="7 Days" />
+      <input name="submit_3day" type="submit" value="3 Day" />
+      <input name="submit_7day" type="submit" value="7 Day" />
     </form>
     <div id="curve_chart_with_switch"></div>
     </center>
