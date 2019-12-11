@@ -350,7 +350,12 @@ def dictToClass(settingsDict, settingsClass):
    return [allValid, allAvailValid, anyValid]
 
 def floatToIntStr(floatVal):
-   return str(int(floatVal + 0.5))
+   if floatVal > 0.0:
+      return str(int(floatVal + 0.5))
+   elif floatVal < 0.0:
+      return str(-int(-floatVal + 0.5))
+   else:
+      return str(0)
 
 def safeConvertToStr(convertFunc, inVal, failRetVal = ""):
    retVal = failRetVal
