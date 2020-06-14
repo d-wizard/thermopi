@@ -357,6 +357,12 @@ def floatToIntStr(floatVal):
    else:
       return str(0)
 
+def tempToTimeStr(tempVal):
+   if float(int(tempVal)) == float(tempVal):
+      return str(int(tempVal))
+   else:
+      return "{:.1f}".format(tempVal)
+
 def safeConvertToStr(convertFunc, inVal, failRetVal = ""):
    retVal = failRetVal
    try:
@@ -380,16 +386,16 @@ def classToDict(settingsClass, settingsDict):
    
    settingsDict['TimeBetweenTempCheck'] = safeConvertToStr(floatToIntStr, settingsClass.TIME_BETWEEN_TEMPERATURE_CHECK)
    
-   settingsDict['SwitchOnTemp'] = safeConvertToStr(floatToIntStr, settingsClass.SWITCH_ON_TEMPERATURE)
-   settingsDict['SwitchOffTemp'] = safeConvertToStr(floatToIntStr, settingsClass.SWITCH_OFF_TEMPERATURE)
+   settingsDict['SwitchOnTemp'] = safeConvertToStr(tempToTimeStr, settingsClass.SWITCH_ON_TEMPERATURE)
+   settingsDict['SwitchOffTemp'] = safeConvertToStr(tempToTimeStr, settingsClass.SWITCH_OFF_TEMPERATURE)
 
    settingsDict['SmartPlugIpAddr'] = settingsClass.SMART_PLUG_IP_ADDR
    
    settingsDict['TimeOfDayToStart'] = safeConvertToStr(timeIntToStr, settingsClass.TIME_OF_DAY_TO_START)
    settingsDict['TimeOfDayToStop'] = safeConvertToStr(timeIntToStr, settingsClass.TIME_OF_DAY_TO_STOP)
    
-   settingsDict['InvalidTempLow'] = safeConvertToStr(floatToIntStr, settingsClass.INVALID_TEMPERATURE_LOW)
-   settingsDict['InvalidTempHigh'] = safeConvertToStr(floatToIntStr, settingsClass.INVALID_TEMPERATURE_HIGH)
+   settingsDict['InvalidTempLow'] = safeConvertToStr(tempToTimeStr, settingsClass.INVALID_TEMPERATURE_LOW)
+   settingsDict['InvalidTempHigh'] = safeConvertToStr(tempToTimeStr, settingsClass.INVALID_TEMPERATURE_HIGH)
    
    # Determine what to set the switch to when entering the time of day to stop controlling the switch.
    settingsDict['SwitchStateAfterTimeOfDayStop'] = switchStateAfterTimeOfDayStop_toStr(settingsClass.SWITCH_STATE_AFTER_TIME_OF_DAY_STOP)
