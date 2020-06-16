@@ -9,12 +9,28 @@ body {margin:0;}
 body {font-family: Arial, Helvetica, sans-serif;}
 h1 {font-size: 1.5em;}
 
+.devicebar {
+  overflow: hidden;
+  background-color: #000;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  padding: 14px 16px;
+  font-size: 17px;
+  color: #FFF
+}
+
+.devicebar td {
+  font-size: 17px;
+  color: #FFF
+}
+.devicebar td:nth-child(2) { padding-right:30px; white-space: nowrap; width: 1% }
 
 .navbar {
   overflow: hidden;
   background-color: #333;
   position: fixed;
-  top: 0;
+  top: 47px;
   width: 100%;
 }
 
@@ -38,7 +54,7 @@ h1 {font-size: 1.5em;}
   overflow: hidden;
   background-color: #ddd;
   position: fixed;
-  top: 47px;
+  top: 94px;
   width: 100%;
 }
 
