@@ -92,7 +92,9 @@ SettingsKeyWords = [
     "TimeBetweenTempCheck",              
     "InvalidTempLow",                    
     "InvalidTempHigh",                   
-    "SwitchStateAfterTimeOfDayStop"
+    "SwitchStateAfterTimeOfDayStop",
+    "DeviceName",
+    "DeviceColor"
 ]
 
 StatusKeyWords = [

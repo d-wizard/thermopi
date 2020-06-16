@@ -1,15 +1,24 @@
+<?php
+   // Get the current settings.
+   include 'setGetSettings.php';
+   setGet("");
+?>
 <html>
 <head>
 <link rel="stylesheet" type="text/css" href="thermo.css">
 <meta name="viewport" content="width=device-width" />
 <title>Advanced Settings</title>
 </head>
-   <body>
+   <body style='background-color : <?php echo $DeviceColor;?>' >
    <?php
       /////////////////////////////////////////////////////////
       // This code will run every time something happens.
       /////////////////////////////////////////////////////////
-      include 'setGetSettings.php';
+      // 
+      $deviceCmds = array(
+         'DeviceName',
+         'DeviceColor'
+      );
 
       // 
       $timeCmds = array(
@@ -31,6 +40,16 @@
       );
 
       $pyArgsStr = "";
+
+      // Check if Device Settings have been submitted.
+      if(isset($_POST["submit_device"]))
+      {
+         for($i = 0; $i < count($deviceCmds); $i++)
+         {
+            $cmdStr = $deviceCmds[$i];
+            $pyArgsStr = $pyArgsStr." --".$cmdStr." '".$_POST[$cmdStr."_val"]."'";
+         }
+      }
 
       // Check if Time Settings have been submitted.
       if(isset($_POST["submit_time"]))
@@ -89,6 +108,12 @@
       }
    ?>
    
+   <div class="devicebar">
+      <table style="width:100%"><tr>
+         <td><?php echo $DeviceName;?></td>
+         <td><img src="<?php echo $hotColdIconImg17;?>"> <?php echo $currentTemperature;?></td>
+      </tr></table>
+   </div>
    <div class="navbar">
       <a href="status.php">Status</a>
       <a href="basic.php">Settings</a>
@@ -99,10 +124,26 @@
       <a href="basic.php">Basic</a>
       <a href="advanced.php">Advanced</a>
    </div>
-   <br><br><br><br><br>
+   <br><br><br><br><br><br><br><br>
 
    <center>
       <form action="advanced.php" method="post">
+
+         <h1>Device Settings</h1>
+         <table cellpadding="5">
+            <tr>
+               <td>Device Name</td>
+               <td><input name="DeviceName_val" type="text" value="<?php echo $DeviceName;?>" /></td>
+            </tr>
+            <tr>
+               <td>Device Color</td>
+               <td><input name="DeviceColor_val" type="color" value="<?php echo $DeviceColor;?>" /></td>
+            </tr>
+            <tr>
+               <td colspan="2"><center><input name="submit_device" type="submit" value="Update Device Settings" /></center></td>
+            </tr>
+         </table>
+         <br><hr>
 
          <h1>Time Settings</h1>
          <table cellpadding="5">
