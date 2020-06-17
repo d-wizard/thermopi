@@ -1,5 +1,7 @@
 <?php
-    $pythonSetGetScript = 'python /home/pi/thermo/changeSettings.py';
+    $thisScriptDir = dirname(__FILE__);
+    $thermoPythonDir = $thisScriptDir."/../"; # The directory with all the python scripts is up one directory from this script.
+    $pythonSetGetScript = "python ".$thermoPythonDir."/changeSettings.py";
 
     // 
     $TimeOfDayToStart = "";

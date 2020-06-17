@@ -13,7 +13,7 @@
         /////////////////////////////////////////////////////////
         // This code will run every time something happens.
         /////////////////////////////////////////////////////////        
-        $pythonScript = "python /home/pi/thermo/getTempChartArray.py";
+        $pythonScript = "python ".$thermoPythonDir."getTempChartArray.py";
         $titleStr = "'Temperature - 1 Day'";
 
         $time = 3600*24;
