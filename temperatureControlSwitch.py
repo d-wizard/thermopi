@@ -651,6 +651,7 @@ def determineIfSwitchStateNeedsToBeSet(temperature):
 ################################################################################
 def setSmartPlugState_withCheck(switchState):
    global currentTempCtrlSettings
+   global currentSwitchState
    # Check for situation where we need to return silently. This is used for situations where no smart switch exists, but the temperature sensor is being manually monitored.
    if currentTempCtrlSettings.SMART_PLUG_IP_ADDR == None or currentTempCtrlSettings.SMART_PLUG_IP_ADDR == "":
       currentSwitchState = True if switchState == SWITCH_STATE_ON else False
@@ -687,12 +688,12 @@ def setSmartPlugState_withCheck(switchState):
 
 def setSmartPlugState_withoutCheck(switchState):
    global currentTempCtrlSettings
+   global currentSwitchState
    # Check for situation where we need to return silently. This is used for situations where no smart switch exists, but the temperature sensor is being manually monitored.
    if currentTempCtrlSettings.SMART_PLUG_IP_ADDR == None or currentTempCtrlSettings.SMART_PLUG_IP_ADDR == "":
       currentSwitchState = True if switchState == SWITCH_STATE_ON else False
       return CHANGE_SWITCH_RESULT_SUCCESS_NO_CHANGE_NEEDED
 
-   global currentSwitchState
    retVal = CHANGE_SWITCH_RESULT_FAILED
 
    try:
