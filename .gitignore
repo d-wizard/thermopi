@@ -1,0 +1,11 @@
+changeSettings.log
+getTempChartArray.pyc
+ipc.pyc
+ipcSocket
+smartPlugLib.pyc
+temperature.lock
+temperature.log
+temperatureControlSwitch.log
+temperatureSensorLib.pyc
+tplink-smartplug/tplinkSmartplugLib.pyc
+web/tempCtrlSwitch.log

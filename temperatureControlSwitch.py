@@ -37,6 +37,9 @@ class tempCtrlSwitchSettings(object):
       self.INVALID_TEMPERATURE_LOW  = None # in degrees Fahrenheit
       self.INVALID_TEMPERATURE_HIGH = None # in degrees Fahrenheit
 
+      self.DEVICE_NAME = None
+      self.DEVICE_COLOR = None
+
    def __eq__(self, obj):
       return isinstance(obj, tempCtrlSwitchSettings) and \
       obj.MIN_TIME_BETWEEN_CHANGING_SWITCH_STATE == self.MIN_TIME_BETWEEN_CHANGING_SWITCH_STATE and \
@@ -50,7 +53,9 @@ class tempCtrlSwitchSettings(object):
       obj.SWITCH_STATE_AFTER_TIME_OF_DAY_STOP == self.SWITCH_STATE_AFTER_TIME_OF_DAY_STOP and \
       obj.TEMPERATURE_AVERAGE_TIME_AMOUNT == self.TEMPERATURE_AVERAGE_TIME_AMOUNT and \
       obj.INVALID_TEMPERATURE_LOW == self.INVALID_TEMPERATURE_LOW and \
-      obj.INVALID_TEMPERATURE_HIGH == self.INVALID_TEMPERATURE_HIGH
+      obj.INVALID_TEMPERATURE_HIGH == self.INVALID_TEMPERATURE_HIGH and \
+      obj.DEVICE_NAME == self.DEVICE_NAME and \
+      obj.DEVICE_COLOR == self.DEVICE_COLOR
    def __ne__(self, obj):
       result = self.__eq__(obj)
       if result is NotImplemented:
@@ -328,6 +333,15 @@ def dictToClass(settingsDict, settingsClass):
    settingsClass.INVALID_TEMPERATURE_HIGH = val
    [allValid, allAvailValid, anyValid] = getValidDictToClass(allValid, allAvailValid, anyValid, exists, converted)
 
+   [exists, converted, val] = tryDictSettingToType(str, settingsDict, 'DeviceName', settingsClass.DEVICE_NAME)
+   settingsClass.DEVICE_NAME = val
+   [allValid, allAvailValid, anyValid] = getValidDictToClass(allValid, allAvailValid, anyValid, exists, converted)
+
+   [exists, converted, val] = tryDictSettingToType(str, settingsDict, 'DeviceColor', settingsClass.DEVICE_COLOR)
+   settingsClass.DEVICE_COLOR = val
+   [allValid, allAvailValid, anyValid] = getValidDictToClass(allValid, allAvailValid, anyValid, exists, converted)
+
+   # Do SwitchStateAfterTimeOfDayStop last so we can do a little extra conversion.
    [exists, converted, val] = tryDictSettingToType(str, settingsDict, 'SwitchStateAfterTimeOfDayStop', settingsClass.SWITCH_STATE_AFTER_TIME_OF_DAY_STOP)
    [allValid, allAvailValid, anyValid] = getValidDictToClass(allValid, allAvailValid, anyValid, exists, converted)
 
@@ -400,6 +414,9 @@ def classToDict(settingsClass, settingsDict):
    # Determine what to set the switch to when entering the time of day to stop controlling the switch.
    settingsDict['SwitchStateAfterTimeOfDayStop'] = switchStateAfterTimeOfDayStop_toStr(settingsClass.SWITCH_STATE_AFTER_TIME_OF_DAY_STOP)
 
+   settingsDict['DeviceName'] = settingsClass.DEVICE_NAME
+   settingsDict['DeviceColor'] = settingsClass.DEVICE_COLOR
+
 def loadSettingsFromJson():
    global currentTempCtrlSettings
    global currentTempCtrlDict
@@ -431,6 +448,8 @@ def printTempCtrlSettings(tempCtrlSettings):
       logMsg("On Temp                 = " + str(tempCtrlSettings.SWITCH_ON_TEMPERATURE) + tempUnit)
       logMsg("Stop Time               = " + timeIntToStr(tempCtrlSettings.TIME_OF_DAY_TO_STOP, True))
       logMsg("Start Time              = " + timeIntToStr(tempCtrlSettings.TIME_OF_DAY_TO_START, True))
+      logMsg("Device Color            = " + str(tempCtrlSettings.DEVICE_COLOR))
+      logMsg("Device Name             = " + str(tempCtrlSettings.DEVICE_NAME))
    except:
       pass
 
@@ -632,6 +651,12 @@ def determineIfSwitchStateNeedsToBeSet(temperature):
 ################################################################################
 def setSmartPlugState_withCheck(switchState):
    global currentTempCtrlSettings
+   global currentSwitchState
+   # Check for situation where we need to return silently. This is used for situations where no smart switch exists, but the temperature sensor is being manually monitored.
+   if currentTempCtrlSettings.SMART_PLUG_IP_ADDR == None or currentTempCtrlSettings.SMART_PLUG_IP_ADDR == "":
+      currentSwitchState = True if switchState == SWITCH_STATE_ON else False
+      return CHANGE_SWITCH_RESULT_SUCCESS_NO_CHANGE_NEEDED
+
    retVal = CHANGE_SWITCH_RESULT_FAILED
 
    try:
@@ -664,6 +689,11 @@ def setSmartPlugState_withCheck(switchState):
 def setSmartPlugState_withoutCheck(switchState):
    global currentTempCtrlSettings
    global currentSwitchState
+   # Check for situation where we need to return silently. This is used for situations where no smart switch exists, but the temperature sensor is being manually monitored.
+   if currentTempCtrlSettings.SMART_PLUG_IP_ADDR == None or currentTempCtrlSettings.SMART_PLUG_IP_ADDR == "":
+      currentSwitchState = True if switchState == SWITCH_STATE_ON else False
+      return CHANGE_SWITCH_RESULT_SUCCESS_NO_CHANGE_NEEDED
+
    retVal = CHANGE_SWITCH_RESULT_FAILED
 
    try:

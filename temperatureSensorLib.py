@@ -1,9 +1,11 @@
 import os
 import time
 
+PATH_TO_SENSOR = ""
 
 def temp_raw():
-   temp_sensor = '/sys/bus/w1/devices/28-800000271ffe/w1_slave'
+   global PATH_TO_SENSOR
+   temp_sensor = PATH_TO_SENSOR #'/sys/bus/w1/devices/28-800000271ffe/w1_slave'
    f = open(temp_sensor, 'r')
    lines = f.readlines()
    f.close()
@@ -23,9 +25,32 @@ def read_temp():
       temp_f = temp_c * 9.0 / 5.0 + 32.0
       return temp_c, temp_f
 
+def findTempSensor(serialNum = None):
+   pathToSensor = ""
+   sensorBasePath = '/sys/bus/w1/devices/'
+   sensorPrefix = '28-'
+   sensorFile = 'w1_slave'
+
+   if serialNum != None:
+      tryPath = os.path.join(sensorBasePath, sensorPrefix+serialNum, sensorFile)
+      if os.path.isfile(tryPath):
+         pathToSensor = tryPath
+
+   if pathToSensor == "":
+      sensors = os.listdir(sensorBasePath)
+      for sensor in sensors:
+         try:
+            if sensor[:len(sensorPrefix)] == sensorPrefix and os.path.isfile(os.path.join(sensorBasePath, sensor, sensorFile)):
+               pathToSensor = os.path.join(sensorBasePath, sensor, sensorFile)
+         except:
+            pass
+
+   return pathToSensor
 
 
-def temperatureSensor_init():
+def temperatureSensor_init(serialNum = None):
+   global PATH_TO_SENSOR
+   PATH_TO_SENSOR = findTempSensor(serialNum)
    os.system('modprobe w1-gpio')
    os.system('modprobe w1-therm')
 
