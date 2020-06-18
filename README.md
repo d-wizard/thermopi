@@ -7,7 +7,8 @@ This project uses the following:
 4) A webserver running on the Raspberry Pi that supports PHP
 ---
 Initialize the Repo:
-* /path/to/thermopi/firstSetup.sh
+* cd /path/to/thermopi
+* ./firstSetup.sh
 ---
 Create symbolic link of the web folder to the webserver:
 * sudo ln -nfs /path/to/thermopi/web /path/to/webserver/thermopi
