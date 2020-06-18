@@ -96,6 +96,7 @@
             1: {ticks: [0,1], textPosition: 'none'},
             0: {title: 'Temperature (°F)', textPosition: 'out'}
           },
+          backgroundColor: '<?php echo $DeviceColor;?>',
           width: chartW,
           height: chartH
         };
