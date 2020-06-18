@@ -36,7 +36,7 @@ def findTempSensor(serialNum = None):
       if os.path.isfile(tryPath):
          pathToSensor = tryPath
 
-   if pathToSensor == "":
+   if pathToSensor == "" and os.path.isdir(sensorBasePath):
       sensors = os.listdir(sensorBasePath)
       for sensor in sensors:
          try:
