@@ -8,6 +8,7 @@
   <head>
     <link rel="stylesheet" type="text/css" href="thermo.css">
     <meta name="viewport" content="width=device-width" />
+    <title><?php echo $DeviceName;?></title>
     
     <?php
         /////////////////////////////////////////////////////////

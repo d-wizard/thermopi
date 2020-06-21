@@ -8,7 +8,7 @@
 <head>
 <link rel="stylesheet" type="text/css" href="thermo.css">
 <meta name="viewport" content="width=device-width" />
-<title>Log</title>
+<title><?php echo $DeviceName;?></title>
 </head>
    <body style='background-color : <?php echo $DeviceColor;?>' >
    

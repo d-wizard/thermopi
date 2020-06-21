@@ -10,7 +10,7 @@
 <meta name="viewport" content="width=device-width" />
 <style>
 </style>
-<title>Basic Settings</title>
+<title><?php echo $DeviceName;?></title>
 </head>
    <body style='background-color : <?php echo $DeviceColor;?>' >
    
