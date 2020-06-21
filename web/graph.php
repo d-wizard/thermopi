@@ -16,7 +16,7 @@
         // This code will run every time something happens.
         /////////////////////////////////////////////////////////        
         $pythonScript = "python ".$thermoPythonDir."getTempChartArray.py";
-        $titleStr = "'Temperature - 1 Day'";
+        $titleStr = "Temperature - 1 Day";
 
         $time = 3600*24;
         $numPoints = 600;
@@ -25,37 +25,37 @@
         {
           $time = 3600;
           $numPoints = 100;
-          $titleStr = "'Temperature - 1 Hr'";
+          $titleStr = "Temperature - 1 Hr";
         }
         if(isset($_GET["submit_4hr"]))
         {
           $time = 3600*4;
           $numPoints = 400;
-          $titleStr = "'Temperature - 4 Hrs'";
+          $titleStr = "Temperature - 4 Hrs";
         }
         if(isset($_GET["submit_12hr"]))
         {
           $time = 3600*12;
           $numPoints = 500;
-          $titleStr = "'Temperature - 12 Hrs'";
+          $titleStr = "Temperature - 12 Hrs";
         }
         if(isset($_GET["submit_1day"]))
         {
           $time = 3600*24;
           $numPoints = 600;
-          $titleStr = "'Temperature - 1 Day'";
+          $titleStr = "Temperature - 1 Day";
         }
         if(isset($_GET["submit_3day"]))
         {
           $time = 3600*24*3;
           $numPoints = 800;
-          $titleStr = "'Temperature - 3 Days'";
+          $titleStr = "Temperature - 3 Days";
         }
         if(isset($_GET["submit_7day"]))
         {
           $time = 3600*24*7;
           $numPoints = 2000;
-          $titleStr = "'Temperature - 7 Days'";
+          $titleStr = "Temperature - 7 Days";
         }
     ?>
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
@@ -68,7 +68,7 @@
 
       var upperH = Math.floor(chartW/1.1);
       var lowerH = 200;
-      chartH = chartH - 100;
+      chartH = chartH - 200;
 
 
       if (chartH > upperH) {
@@ -85,7 +85,14 @@
         ]);
 
         var options = {
-          title: <?php echo $titleStr;?>,
+          chartArea:{
+            left:"10%",
+            right:"4%",
+            bottom:"12%",
+            top:"4%",
+            width:"95%",
+            height:"90%"
+          },
           titleTextStyle: { fontSize: 20},
           legend: { position: 'bottom' },
           // Gives each series an axis that matches the vAxes number below.
@@ -134,6 +141,7 @@
       <input name="submit_3day" type="submit" value="3 Day" />
       <input name="submit_7day" type="submit" value="7 Day" />
     </form>
+    <h3><?php echo $titleStr;?></h3>
     <div id="curve_chart_with_switch"></div>
     </center>
   </body>
