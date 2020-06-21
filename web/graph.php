@@ -86,7 +86,7 @@
 
         var options = {
           chartArea:{
-            left:"10%",
+            left:"12%",
             right:"4%",
             bottom:"12%",
             top:"4%",
