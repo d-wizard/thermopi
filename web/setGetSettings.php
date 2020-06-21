@@ -29,8 +29,9 @@
     $currentTemperature = "";
     $switchState  = "";
 
-    $hotColdIconImg = "";
     $hotColdIconImg17 = "";
+    $hotColdIconImg48 = "";
+    $hotColdIconImgIcon = "";
 
     function setGet($argsStr)
     {
@@ -42,7 +43,7 @@
         global $SwitchStateAfterTimeOfDayStop;
         global $DeviceName, $DeviceColor;
         global $currentTemperature, $switchState;
-        global $hotColdIconImg, $hotColdIconImg17;
+        global $hotColdIconImg17, $hotColdIconImg48, $hotColdIconImgIcon;
 
         $curSettings = shell_exec($pythonSetGetScript.$argsStr);
         $curSettings_arr = explode ("|", $curSettings);
@@ -69,25 +70,30 @@
         $currentTemperature = $curSettings_arr[13]."° F";
         $switchState = $curSettings_arr[14];
 
-        $hotColdIconImg = "";
+        $hotColdIconImg17 = "";
+        $hotColdIconImg48 = "";
+        $hotColdIconImgIcon = "";
         if($SwitchOnTemp < $SwitchOffTemp)
         {
-            $hotColdIconImg = "hot.png";
             if($switchState == "On"){
                 $hotColdIconImg17 = "hot.17.color.png";
+                $hotColdIconImg48 = "hot.48.color.png"; 
             } else {
                 $hotColdIconImg17 = "hot.17.gray.png";
+                $hotColdIconImg48 = "hot.48.gray.png"; 
             }
         }
         elseif($SwitchOnTemp > $SwitchOffTemp)
         {
-            $hotColdIconImg = "cold.png";
             if($switchState == "On"){
                 $hotColdIconImg17 = "cold.17.color.png";
+                $hotColdIconImg48 = "cold.48.color.png"; 
             } else {
                 $hotColdIconImg17 = "cold.17.gray.png";
+                $hotColdIconImg48 = "cold.48.gray.png"; 
             }
         }
+        $hotColdIconImgIcon = $hotColdIconImg48;
     }
 
 ?>

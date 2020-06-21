@@ -9,6 +9,7 @@
 <link rel="stylesheet" type="text/css" href="thermo.css">
 <meta name="viewport" content="width=device-width" />
 <title><?php echo $DeviceName;?></title>
+<link rel="icon" href="<?php echo $hotColdIconImgIcon;?>">
 </head>
    <body style='background-color : <?php echo $DeviceColor;?>' >
       
@@ -46,7 +47,7 @@
             <td><div class="statusVal"><?php echo $switchState;?></div></td>
          </tr>
       </table>
-      <br><br><img src="<?php echo $hotColdIconImg;?>">
+      <br><br><img src="<?php echo $hotColdIconImg48;?>">
    </center>
 
    </body>

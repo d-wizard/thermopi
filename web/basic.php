@@ -11,6 +11,7 @@
 <style>
 </style>
 <title><?php echo $DeviceName;?></title>
+<link rel="icon" href="<?php echo $hotColdIconImgIcon;?>">
 </head>
    <body style='background-color : <?php echo $DeviceColor;?>' >
    
@@ -92,7 +93,7 @@
             </tr>
          </table>
 
-         <br><img src="<?php echo $hotColdIconImg;?>">
+         <br><img src="<?php echo $hotColdIconImg48;?>">
       </form>
 
    </center>
