@@ -583,8 +583,7 @@ def setupIcpServer(socketPath):
 ################################################################################
 # Temperature Helper Functions
 ################################################################################
-def getTemperature():
-   global currentTempCtrlSettings
+def getTemperature(tempCtrlSettings):
    curTemperature = temperatureSensorLib.temperatureSensor_getFahrenheit()
    
    retVal = curTemperature
@@ -597,7 +596,7 @@ def getTemperature():
       lastTemperatureValue = curTemperature
 
       if curTemperature != None:
-         if curTemperature > currentTempCtrlSettings.INVALID_TEMPERATURE_HIGH or curTemperature < currentTempCtrlSettings.INVALID_TEMPERATURE_LOW:
+         if curTemperature > tempCtrlSettings.INVALID_TEMPERATURE_HIGH or curTemperature < tempCtrlSettings.INVALID_TEMPERATURE_LOW:
             logMsg("Invalid temperature from sensor: " + str(curTemperature))
             curTemperature = None
          else:
@@ -606,7 +605,7 @@ def getTemperature():
          logMsg("Failed to read from temperature sensor.")
    
       # Remove old temperature values from the list.
-      maxNumValuesToStore = int(math.ceil(currentTempCtrlSettings.TEMPERATURE_AVERAGE_TIME_AMOUNT / currentTempCtrlSettings.TIME_BETWEEN_TEMPERATURE_CHECK))
+      maxNumValuesToStore = int(math.ceil(tempCtrlSettings.TEMPERATURE_AVERAGE_TIME_AMOUNT / tempCtrlSettings.TIME_BETWEEN_TEMPERATURE_CHECK))
       if len(temperatureStoreValuesForAverage) >= maxNumValuesToStore:
          temperatureStoreValuesForAverage = temperatureStoreValuesForAverage[-maxNumValuesToStore:]
       
@@ -624,21 +623,19 @@ def getTemperature():
    
    return retVal
 
-def determineIfSwitchStateNeedsToBeSet(temperature):
-   global currentTempCtrlSettings
-   
+def determineIfSwitchStateNeedsToBeSet(temperature, tempCtrlSettings):
    retVal = SWITCH_STATE_NO_CHANGE
    
    try:
-      if currentTempCtrlSettings.SWITCH_ON_TEMPERATURE > currentTempCtrlSettings.SWITCH_OFF_TEMPERATURE:
-         if temperature >= currentTempCtrlSettings.SWITCH_ON_TEMPERATURE:
+      if tempCtrlSettings.SWITCH_ON_TEMPERATURE > tempCtrlSettings.SWITCH_OFF_TEMPERATURE:
+         if temperature >= tempCtrlSettings.SWITCH_ON_TEMPERATURE:
             retVal = SWITCH_STATE_ON
-         elif temperature <= currentTempCtrlSettings.SWITCH_OFF_TEMPERATURE:
+         elif temperature <= tempCtrlSettings.SWITCH_OFF_TEMPERATURE:
             retVal = SWITCH_STATE_OFF
       else:
-         if temperature <= currentTempCtrlSettings.SWITCH_ON_TEMPERATURE:
+         if temperature <= tempCtrlSettings.SWITCH_ON_TEMPERATURE:
             retVal = SWITCH_STATE_ON
-         elif temperature >= currentTempCtrlSettings.SWITCH_OFF_TEMPERATURE:
+         elif temperature >= tempCtrlSettings.SWITCH_OFF_TEMPERATURE:
             retVal = SWITCH_STATE_OFF
    except:
       logMsg("Failed to determine if the switch state needs to be set.")
@@ -649,11 +646,10 @@ def determineIfSwitchStateNeedsToBeSet(temperature):
 ################################################################################
 # Smart Plug Helper Functions
 ################################################################################
-def setSmartPlugState_withCheck(switchState):
-   global currentTempCtrlSettings
+def setSmartPlugState_withCheck(switchState, tempCtrlSettings):
    global currentSwitchState
    # Check for situation where we need to return silently. This is used for situations where no smart switch exists, but the temperature sensor is being manually monitored.
-   if currentTempCtrlSettings.SMART_PLUG_IP_ADDR == None or currentTempCtrlSettings.SMART_PLUG_IP_ADDR == "":
+   if tempCtrlSettings.SMART_PLUG_IP_ADDR == None or tempCtrlSettings.SMART_PLUG_IP_ADDR == "":
       currentSwitchState = True if switchState == SWITCH_STATE_ON else False
       return CHANGE_SWITCH_RESULT_SUCCESS_NO_CHANGE_NEEDED
 
@@ -664,14 +660,14 @@ def setSmartPlugState_withCheck(switchState):
       if switchState == SWITCH_STATE_ON:
          desiredSwitchState = True
       
-      currentSwitchState = smartPlugLib.smartPlug_getState(currentTempCtrlSettings.SMART_PLUG_IP_ADDR)
+      currentSwitchState = smartPlugLib.smartPlug_getState(tempCtrlSettings.SMART_PLUG_IP_ADDR)
       
       if currentSwitchState != None:
          if currentSwitchState != desiredSwitchState:
             logMsg("Changing switch state to: " + str(switchState))
 
             time.sleep(1) # Just talked to the switch to determine status. Wait a moment before setting the new state. (Probably not necessary, but shouldn't hurt either.)
-            success = smartPlugLib.smartPlug_onOff(currentTempCtrlSettings.SMART_PLUG_IP_ADDR, desiredSwitchState)
+            success = smartPlugLib.smartPlug_onOff(tempCtrlSettings.SMART_PLUG_IP_ADDR, desiredSwitchState)
             
             if success:
                retVal = CHANGE_SWITCH_RESULT_SUCCESS_SWITCH_STATE_CHANGED
@@ -686,11 +682,10 @@ def setSmartPlugState_withCheck(switchState):
    return retVal
 
 
-def setSmartPlugState_withoutCheck(switchState):
-   global currentTempCtrlSettings
+def setSmartPlugState_withoutCheck(switchState, tempCtrlSettings):
    global currentSwitchState
    # Check for situation where we need to return silently. This is used for situations where no smart switch exists, but the temperature sensor is being manually monitored.
-   if currentTempCtrlSettings.SMART_PLUG_IP_ADDR == None or currentTempCtrlSettings.SMART_PLUG_IP_ADDR == "":
+   if tempCtrlSettings.SMART_PLUG_IP_ADDR == None or tempCtrlSettings.SMART_PLUG_IP_ADDR == "":
       currentSwitchState = True if switchState == SWITCH_STATE_ON else False
       return CHANGE_SWITCH_RESULT_SUCCESS_NO_CHANGE_NEEDED
 
@@ -708,7 +703,7 @@ def setSmartPlugState_withoutCheck(switchState):
          logMsg("Changing switch state to: " + str(switchState))
          switchStateIsChanging = True
       
-      success = smartPlugLib.smartPlug_onOff(currentTempCtrlSettings.SMART_PLUG_IP_ADDR, desiredSwitchState)
+      success = smartPlugLib.smartPlug_onOff(tempCtrlSettings.SMART_PLUG_IP_ADDR, desiredSwitchState)
       
       if success:
          currentSwitchState = desiredSwitchState
@@ -726,17 +721,16 @@ def setSmartPlugState_withoutCheck(switchState):
 ################################################################################
 # Time Helper Functions
 ################################################################################
-def getSleepTimeUntilNextTemperatureCheckTime():
-   global currentTempCtrlSettings
+def getSleepTimeUntilNextTemperatureCheckTime(tempCtrlSettings):
    global nextTemperatureCheckTime
-   sleepTime = currentTempCtrlSettings.TIME_BETWEEN_TEMPERATURE_CHECK
+   sleepTime = tempCtrlSettings.TIME_BETWEEN_TEMPERATURE_CHECK
 
    try:
       # Determine the next time to check the temperature.
-      nextTemperatureCheckTime += currentTempCtrlSettings.TIME_BETWEEN_TEMPERATURE_CHECK
+      nextTemperatureCheckTime += tempCtrlSettings.TIME_BETWEEN_TEMPERATURE_CHECK
       currentTime = getCurrentTime()
       while nextTemperatureCheckTime < currentTime:
-         nextTemperatureCheckTime += currentTempCtrlSettings.TIME_BETWEEN_TEMPERATURE_CHECK
+         nextTemperatureCheckTime += tempCtrlSettings.TIME_BETWEEN_TEMPERATURE_CHECK
       
       # Sleep until the next time to check the temperature.
       sleepTime = nextTemperatureCheckTime - currentTime
@@ -744,24 +738,23 @@ def getSleepTimeUntilNextTemperatureCheckTime():
       logMsg("Failed to determine sleep amount, using default.")
    return sleepTime
    
-def isItTimeOfDayToControlSwitch():
+def isItTimeOfDayToControlSwitch(tempCtrlSettings):
    retVal = False
    
    try:
-      global currentTempCtrlSettings
       timeFormatStr = "%H%M" # Note: default time format string is "%c"
       now = time.strftime(timeFormatStr)
       timestamp = "{}".format(now)
       
       nowTimeOfDay = int(timestamp)
 
-      if currentTempCtrlSettings.TIME_OF_DAY_TO_START > currentTempCtrlSettings.TIME_OF_DAY_TO_STOP:
+      if tempCtrlSettings.TIME_OF_DAY_TO_START > tempCtrlSettings.TIME_OF_DAY_TO_STOP:
          # Start in 1 day and ends in the next day
-         if nowTimeOfDay >= currentTempCtrlSettings.TIME_OF_DAY_TO_START or nowTimeOfDay < currentTempCtrlSettings.TIME_OF_DAY_TO_STOP:
+         if nowTimeOfDay >= tempCtrlSettings.TIME_OF_DAY_TO_START or nowTimeOfDay < tempCtrlSettings.TIME_OF_DAY_TO_STOP:
             retVal = True
       else:
          # Start and end in same day
-         if nowTimeOfDay >= currentTempCtrlSettings.TIME_OF_DAY_TO_START and nowTimeOfDay < currentTempCtrlSettings.TIME_OF_DAY_TO_STOP:
+         if nowTimeOfDay >= tempCtrlSettings.TIME_OF_DAY_TO_START and nowTimeOfDay < tempCtrlSettings.TIME_OF_DAY_TO_STOP:
             retVal = True
    except:
       logMsg("Failed to determine time of day.")
@@ -799,25 +792,28 @@ setSmartPlugState = setSmartPlugState_withoutCheck
 # Start Forever Loop
 while 1:
    settingsMutex.acquire()
-   temperature = getTemperature()
+   tempCtrlSettings = copy.copy(currentTempCtrlSettings) # Copy the settings off for use during this loop through the while 1
+   settingsMutex.release()
+
+   temperature = getTemperature(tempCtrlSettings)
    
    if temperature != None:
       extraLog = ""
       try:
          
-         if isItTimeOfDayToControlSwitch():
+         if isItTimeOfDayToControlSwitch(tempCtrlSettings):
             # Check if it is ok to modify the switch state (based on the current time).
             currentTime = getCurrentTime()
             timeSinceLastSwitchChangeFailure = currentTime - lastFailedSwitchChangeTime
             timeSinceLastSwitchChangeSuccess = currentTime - lastSuccessfulSwitchChangeTime
             
-            if timeSinceLastSwitchChangeFailure > currentTempCtrlSettings.MIN_TIME_BETWEEN_RETRYING_SWITCH_CHANGE and \
-               timeSinceLastSwitchChangeSuccess > currentTempCtrlSettings.MIN_TIME_BETWEEN_CHANGING_SWITCH_STATE:
+            if timeSinceLastSwitchChangeFailure > tempCtrlSettings.MIN_TIME_BETWEEN_RETRYING_SWITCH_CHANGE and \
+               timeSinceLastSwitchChangeSuccess > tempCtrlSettings.MIN_TIME_BETWEEN_CHANGING_SWITCH_STATE:
    
-               switchChange = determineIfSwitchStateNeedsToBeSet(temperature)
+               switchChange = determineIfSwitchStateNeedsToBeSet(temperature, tempCtrlSettings)
                
                if switchChange == SWITCH_STATE_ON or switchChange == SWITCH_STATE_OFF:
-                  result = setSmartPlugState(switchChange)
+                  result = setSmartPlugState(switchChange, tempCtrlSettings)
                   
                   if result == CHANGE_SWITCH_RESULT_FAILED:
                      lastFailedSwitchChangeTime = getCurrentTime()
@@ -831,8 +827,8 @@ while 1:
                else:
                   extraLog = switchChange
             else:
-               timeUntilSwitchCanBeSet = max(currentTempCtrlSettings.MIN_TIME_BETWEEN_RETRYING_SWITCH_CHANGE - timeSinceLastSwitchChangeFailure, \
-                                             currentTempCtrlSettings.MIN_TIME_BETWEEN_CHANGING_SWITCH_STATE - timeSinceLastSwitchChangeSuccess)
+               timeUntilSwitchCanBeSet = max(tempCtrlSettings.MIN_TIME_BETWEEN_RETRYING_SWITCH_CHANGE - timeSinceLastSwitchChangeFailure, \
+                                             tempCtrlSettings.MIN_TIME_BETWEEN_CHANGING_SWITCH_STATE - timeSinceLastSwitchChangeSuccess)
                extraLog = "Can't set switch for {:3d} seconds".format(int(timeUntilSwitchCanBeSet))
             
             activeDuringTimeOfDayToControlSwitch = True
@@ -840,11 +836,11 @@ while 1:
             if activeDuringTimeOfDayToControlSwitch:
                extraLog = "Leaving time to control switch - "
                
-               if currentTempCtrlSettings.SWITCH_STATE_AFTER_TIME_OF_DAY_STOP != None:
+               if tempCtrlSettings.SWITCH_STATE_AFTER_TIME_OF_DAY_STOP != None:
                   timeSinceLastSwitchChangeFailure = getCurrentTime() - lastFailedSwitchChangeTime
-                  if timeSinceLastSwitchChangeFailure > currentTempCtrlSettings.MIN_TIME_BETWEEN_RETRYING_SWITCH_CHANGE:
-                     newSwitchState = SWITCH_STATE_ON if currentTempCtrlSettings.SWITCH_STATE_AFTER_TIME_OF_DAY_STOP else SWITCH_STATE_OFF
-                     result = setSmartPlugState(newSwitchState)
+                  if timeSinceLastSwitchChangeFailure > tempCtrlSettings.MIN_TIME_BETWEEN_RETRYING_SWITCH_CHANGE:
+                     newSwitchState = SWITCH_STATE_ON if tempCtrlSettings.SWITCH_STATE_AFTER_TIME_OF_DAY_STOP else SWITCH_STATE_OFF
+                     result = setSmartPlugState(newSwitchState, tempCtrlSettings)
                      if result != CHANGE_SWITCH_RESULT_FAILED:
                         activeDuringTimeOfDayToControlSwitch = False
                         extraLog += ("Succeeded in setting switch state to: " + newSwitchState)
@@ -870,6 +866,9 @@ while 1:
    else:
       logMsg("Failed to read temperature!")
 
-   sleepTime = getSleepTimeUntilNextTemperatureCheckTime()
-   settingsMutex.release() # Unlock Mutex Before the Sleep
+   # Use the most up-to-date settings for the while 1 sleep.
+   settingsMutex.acquire()
+   sleepTime = getSleepTimeUntilNextTemperatureCheckTime(currentTempCtrlSettings)
+   settingsMutex.release()
+
    time.sleep(sleepTime)
