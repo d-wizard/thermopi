@@ -82,12 +82,14 @@ WEB_LOG_PATH = os.path.join(THIS_SCRIPT_DIR, 'web', 'tempCtrlSwitch.log')
 ################################################################################
 # Global Variables
 ################################################################################
-lastSuccessfulSwitchChangeTime = -1000000 # Initialize to a time way in the past to ensure
-lastFailedSwitchChangeTime     = -1000000 # the switch can be set right away at boot time.
+WAY_IN_THE_PAST = -1000000
+lastSuccessfulSwitchChangeTime = WAY_IN_THE_PAST # Initialize to a time way in the past to ensure
+lastFailedSwitchChangeTime     = WAY_IN_THE_PAST # the switch can be set right away at boot time.
 
 nextTemperatureCheckTime = 0
 
-activeDuringTimeOfDayToControlSwitch = False
+checkForSwitchChangeDuringNonSwitchTime = True
+newParametersForMainLoop = True
 
 temperatureStoreValuesForAverage = []
 
@@ -523,12 +525,16 @@ class Response(ipc.Message):
 def updateSettingsFromDict(newSettingsDict):
    global currentTempCtrlDict
    global currentTempCtrlSettings
+   global checkForSwitchChangeDuringNonSwitchTime
+   global newParametersForMainLoop
    try:
       newTempCtrlSettings = copy.copy(currentTempCtrlSettings) # pass in a copy of the current settings. dictToClass will only change the settings that are valid from the dict.
       success = dictToClass(newSettingsDict, newTempCtrlSettings)[2] # [2] is the anyValid flag. If set some settings passed in where valid (i.e. newTempCtrlSettings was updated)
       if success and currentTempCtrlSettings != newTempCtrlSettings:
          currentTempCtrlSettings = newTempCtrlSettings
          classToDict(newTempCtrlSettings, currentTempCtrlDict)
+         checkForSwitchChangeDuringNonSwitchTime = True
+         newParametersForMainLoop = True
 
          logMsg("### Recieved New Settings")
          printTempCtrlSettings(currentTempCtrlSettings)
@@ -812,7 +818,35 @@ def isItTimeOfDayToControlSwitch(tempCtrlSettings):
       logMsg("Failed to determine time of day.")
 
    return retVal
-      
+
+def getTimeUntilSwitchCanBeSet(ignoreTimeSinceLastSuccess = False):
+   global lastFailedSwitchChangeTime
+   global lastSuccessfulSwitchChangeTime
+
+   currentTime = getCurrentTime()
+   timeSinceLastSwitchChangeFailure = currentTime - lastFailedSwitchChangeTime
+   timeSinceLastSwitchChangeSuccess = currentTime - lastSuccessfulSwitchChangeTime
+
+   if ignoreTimeSinceLastSuccess:
+      timeSinceLastSwitchChangeSuccess = tempCtrlSettings.MIN_TIME_BETWEEN_CHANGING_SWITCH_STATE # Set such that different below will be zero.
+   
+   timeUntilSwitchCanBeSet = max(tempCtrlSettings.MIN_TIME_BETWEEN_RETRYING_SWITCH_CHANGE - timeSinceLastSwitchChangeFailure, \
+                                 tempCtrlSettings.MIN_TIME_BETWEEN_CHANGING_SWITCH_STATE - timeSinceLastSwitchChangeSuccess)
+
+   return timeUntilSwitchCanBeSet if timeUntilSwitchCanBeSet > 0 else 0
+
+def resetTimeSwitchCanBeSet(switchSetResult):
+   global lastFailedSwitchChangeTime
+   global lastSuccessfulSwitchChangeTime
+
+   if switchSetResult == CHANGE_SWITCH_RESULT_FAILED:
+      lastFailedSwitchChangeTime = getCurrentTime()
+      lastSuccessfulSwitchChangeTime = WAY_IN_THE_PAST
+
+   elif switchSetResult == CHANGE_SWITCH_RESULT_SUCCESS_SWITCH_STATE_CHANGED or switchSetResult == CHANGE_SWITCH_RESULT_SUCCESS_NO_CHANGE_NEEDED:
+      lastSuccessfulSwitchChangeTime = getCurrentTime()
+      lastFailedSwitchChangeTime = WAY_IN_THE_PAST
+
 
 ################################################################################
 # Program Start
@@ -852,57 +886,46 @@ while 1:
    if temperature != None:
       extraLog = ""
       try:
-         
-         if isItTimeOfDayToControlSwitch(tempCtrlSettings):
+         if isItTimeOfDayToControlSwitch(tempCtrlSettings) and tempCtrlSettings.SWITCH_HEAT_COOL != 0:
             # Check if it is ok to modify the switch state (based on the current time).
-            currentTime = getCurrentTime()
-            timeSinceLastSwitchChangeFailure = currentTime - lastFailedSwitchChangeTime
-            timeSinceLastSwitchChangeSuccess = currentTime - lastSuccessfulSwitchChangeTime
-            
-            if timeSinceLastSwitchChangeFailure > tempCtrlSettings.MIN_TIME_BETWEEN_RETRYING_SWITCH_CHANGE and \
-               timeSinceLastSwitchChangeSuccess > tempCtrlSettings.MIN_TIME_BETWEEN_CHANGING_SWITCH_STATE:
-   
+            timeUntilSwitchCanBeSet = getTimeUntilSwitchCanBeSet()
+            if timeUntilSwitchCanBeSet <= 0:
+               # Switch can be set.
                switchChange = determineIfSwitchStateNeedsToBeSet(temperature, tempCtrlSettings)
                
                if switchChange == SWITCH_STATE_ON or switchChange == SWITCH_STATE_OFF:
                   result = setSmartPlugState(switchChange, tempCtrlSettings)
-                  
-                  if result == CHANGE_SWITCH_RESULT_FAILED:
-                     lastFailedSwitchChangeTime = getCurrentTime()
-                     lastSuccessfulSwitchChangeTime = 0
-   
-                  elif result == CHANGE_SWITCH_RESULT_SUCCESS_SWITCH_STATE_CHANGED or result == CHANGE_SWITCH_RESULT_SUCCESS_NO_CHANGE_NEEDED:
-                     lastSuccessfulSwitchChangeTime = getCurrentTime()
-                     lastFailedSwitchChangeTime = 0
+
+                  resetTimeSwitchCanBeSet(result)
                   
                   extraLog = result
                else:
                   extraLog = switchChange
             else:
-               timeUntilSwitchCanBeSet = max(tempCtrlSettings.MIN_TIME_BETWEEN_RETRYING_SWITCH_CHANGE - timeSinceLastSwitchChangeFailure, \
-                                             tempCtrlSettings.MIN_TIME_BETWEEN_CHANGING_SWITCH_STATE - timeSinceLastSwitchChangeSuccess)
                extraLog = "Can't set switch for {:3d} seconds".format(int(timeUntilSwitchCanBeSet))
             
-            activeDuringTimeOfDayToControlSwitch = True
+            checkForSwitchChangeDuringNonSwitchTime = True
          else:
-            if activeDuringTimeOfDayToControlSwitch:
+            if checkForSwitchChangeDuringNonSwitchTime or newParametersForMainLoop:
+               newParametersForMainLoop = False
                extraLog = "Leaving time to control switch - "
                
                if tempCtrlSettings.SWITCH_STATE_AFTER_TIME_OF_DAY_STOP != None:
-                  timeSinceLastSwitchChangeFailure = getCurrentTime() - lastFailedSwitchChangeTime
-                  if timeSinceLastSwitchChangeFailure > tempCtrlSettings.MIN_TIME_BETWEEN_RETRYING_SWITCH_CHANGE:
+                  if getTimeUntilSwitchCanBeSet(True) <= 0: # Check if we can switch. Since this is a one off time change, ignore the time of the last successful temperature based switch.
+
                      newSwitchState = SWITCH_STATE_ON if tempCtrlSettings.SWITCH_STATE_AFTER_TIME_OF_DAY_STOP else SWITCH_STATE_OFF
                      result = setSmartPlugState(newSwitchState, tempCtrlSettings)
+                     resetTimeSwitchCanBeSet(result)
+
                      if result != CHANGE_SWITCH_RESULT_FAILED:
-                        activeDuringTimeOfDayToControlSwitch = False
+                        checkForSwitchChangeDuringNonSwitchTime = False
                         extraLog += ("Succeeded in setting switch state to: " + newSwitchState)
                      else:
-                        lastFailedSwitchChangeTime = getCurrentTime()
                         extraLog += ("Failed to set switch state to: " + newSwitchState)
                   else:
-                     extraLog += "Last switch setting failed, waiting to retry."
+                     extraLog += "Waiting to be able to change switch state."
                else:
-                  activeDuringTimeOfDayToControlSwitch = False
+                  checkForSwitchChangeDuringNonSwitchTime = False
                   extraLog += "No change of switch specified."
             else:
                extraLog = "Not controlling switch at this time."
