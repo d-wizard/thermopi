@@ -84,8 +84,9 @@ def setGet(newSettings = None): # Returns dictionary
 SettingsKeyWords = [
     "TimeOfDayToStart",                  
     "TimeOfDayToStop",                   
-    "SwitchOnTemp",                      
-    "SwitchOffTemp",                     
+    "SwitchTemperature",                        
+    "SwitchComfortRange",                
+    "SwitchHeatCool",                
     "SmartPlugIpAddr",                   
     "MinTimeBetweenChangingSwitchState", 
     "MinTimeBetweenRetryingSwitchChange",

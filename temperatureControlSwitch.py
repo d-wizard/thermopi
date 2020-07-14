@@ -24,8 +24,9 @@ class tempCtrlSwitchSettings(object):
 
       self.TIME_BETWEEN_TEMPERATURE_CHECK = None # in seconds
 
-      self.SWITCH_ON_TEMPERATURE  = None # in degrees Fahrenheit 
-      self.SWITCH_OFF_TEMPERATURE = None # in degrees Fahrenheit
+      self.SWITCH_TEMPERATURE = None # in degrees Fahrenheit 
+      self.SWITCH_COMFORT_RANGE = None # in degrees Fahrenheit 
+      self.SWITCH_HEAT_COOL = None # -1 = Cool, 0 = Off, 1 = Heat
 
       self.SMART_PLUG_IP_ADDR = None
 
@@ -45,8 +46,9 @@ class tempCtrlSwitchSettings(object):
       obj.MIN_TIME_BETWEEN_CHANGING_SWITCH_STATE == self.MIN_TIME_BETWEEN_CHANGING_SWITCH_STATE and \
       obj.MIN_TIME_BETWEEN_RETRYING_SWITCH_CHANGE == self.MIN_TIME_BETWEEN_RETRYING_SWITCH_CHANGE and \
       obj.TIME_BETWEEN_TEMPERATURE_CHECK == self.TIME_BETWEEN_TEMPERATURE_CHECK and \
-      obj.SWITCH_ON_TEMPERATURE == self.SWITCH_ON_TEMPERATURE and \
-      obj.SWITCH_OFF_TEMPERATURE == self.SWITCH_OFF_TEMPERATURE and \
+      obj.SWITCH_TEMPERATURE == self.SWITCH_TEMPERATURE and \
+      obj.SWITCH_COMFORT_RANGE == self.SWITCH_COMFORT_RANGE and \
+      obj.SWITCH_HEAT_COOL == self.SWITCH_HEAT_COOL and \
       obj.SMART_PLUG_IP_ADDR == self.SMART_PLUG_IP_ADDR and \
       obj.TIME_OF_DAY_TO_START == self.TIME_OF_DAY_TO_START and \
       obj.TIME_OF_DAY_TO_STOP == self.TIME_OF_DAY_TO_STOP and \
@@ -305,12 +307,16 @@ def dictToClass(settingsDict, settingsClass):
    settingsClass.TIME_BETWEEN_TEMPERATURE_CHECK = val
    [allValid, allAvailValid, anyValid] = getValidDictToClass(allValid, allAvailValid, anyValid, exists, converted)
 
-   [exists, converted, val] = tryDictSettingToType(float, settingsDict, 'SwitchOnTemp', settingsClass.SWITCH_ON_TEMPERATURE)
-   settingsClass.SWITCH_ON_TEMPERATURE = val
+   [exists, converted, val] = tryDictSettingToType(float, settingsDict, 'SwitchTemperature', settingsClass.SWITCH_TEMPERATURE)
+   settingsClass.SWITCH_TEMPERATURE = val
    [allValid, allAvailValid, anyValid] = getValidDictToClass(allValid, allAvailValid, anyValid, exists, converted)
 
-   [exists, converted, val] = tryDictSettingToType(float, settingsDict, 'SwitchOffTemp', settingsClass.SWITCH_OFF_TEMPERATURE)
-   settingsClass.SWITCH_OFF_TEMPERATURE = val
+   [exists, converted, val] = tryDictSettingToType(float, settingsDict, 'SwitchComfortRange', settingsClass.SWITCH_COMFORT_RANGE)
+   settingsClass.SWITCH_COMFORT_RANGE = val
+   [allValid, allAvailValid, anyValid] = getValidDictToClass(allValid, allAvailValid, anyValid, exists, converted)
+
+   [exists, converted, val] = tryDictSettingToType(float, settingsDict, 'SwitchHeatCool', settingsClass.SWITCH_HEAT_COOL)
+   settingsClass.SWITCH_HEAT_COOL = val
    [allValid, allAvailValid, anyValid] = getValidDictToClass(allValid, allAvailValid, anyValid, exists, converted)
 
    [exists, converted, val] = tryDictSettingToType(str, settingsDict, 'SmartPlugIpAddr', settingsClass.SMART_PLUG_IP_ADDR)
@@ -371,7 +377,7 @@ def floatToIntStr(floatVal):
    else:
       return str(0)
 
-def tempToTimeStr(tempVal):
+def temperatureToStr(tempVal):
    if float(int(tempVal)) == float(tempVal):
       return str(int(tempVal))
    else:
@@ -394,22 +400,32 @@ def switchStateAfterTimeOfDayStop_toStr(SwitchStateAfterTimeOfDayStop_val):
       retVal = 'No Change'
    return retVal
 
+def heatCool_toStr(heatCool_val):
+   if heatCool_val < 0:
+      retVal = 'Cool'
+   elif heatCool_val > 0:
+      retVal = 'Heat'
+   else:
+      retVal = 'Off'
+   return retVal
+
 def classToDict(settingsClass, settingsDict):
    settingsDict['MinTimeBetweenChangingSwitchState'] = safeConvertToStr(floatToIntStr, settingsClass.MIN_TIME_BETWEEN_CHANGING_SWITCH_STATE)
    settingsDict['MinTimeBetweenRetryingSwitchChange'] = safeConvertToStr(floatToIntStr, settingsClass.MIN_TIME_BETWEEN_RETRYING_SWITCH_CHANGE)
    
    settingsDict['TimeBetweenTempCheck'] = safeConvertToStr(floatToIntStr, settingsClass.TIME_BETWEEN_TEMPERATURE_CHECK)
    
-   settingsDict['SwitchOnTemp'] = safeConvertToStr(tempToTimeStr, settingsClass.SWITCH_ON_TEMPERATURE)
-   settingsDict['SwitchOffTemp'] = safeConvertToStr(tempToTimeStr, settingsClass.SWITCH_OFF_TEMPERATURE)
+   settingsDict['SwitchTemperature'] = safeConvertToStr(temperatureToStr, settingsClass.SWITCH_TEMPERATURE)
+   settingsDict['SwitchComfortRange'] = safeConvertToStr(temperatureToStr, settingsClass.SWITCH_COMFORT_RANGE)
+   settingsDict['SwitchHeatCool'] = safeConvertToStr(floatToIntStr, settingsClass.SWITCH_HEAT_COOL)
 
    settingsDict['SmartPlugIpAddr'] = settingsClass.SMART_PLUG_IP_ADDR
    
    settingsDict['TimeOfDayToStart'] = safeConvertToStr(timeIntToStr, settingsClass.TIME_OF_DAY_TO_START)
    settingsDict['TimeOfDayToStop'] = safeConvertToStr(timeIntToStr, settingsClass.TIME_OF_DAY_TO_STOP)
    
-   settingsDict['InvalidTempLow'] = safeConvertToStr(tempToTimeStr, settingsClass.INVALID_TEMPERATURE_LOW)
-   settingsDict['InvalidTempHigh'] = safeConvertToStr(tempToTimeStr, settingsClass.INVALID_TEMPERATURE_HIGH)
+   settingsDict['InvalidTempLow'] = safeConvertToStr(temperatureToStr, settingsClass.INVALID_TEMPERATURE_LOW)
+   settingsDict['InvalidTempHigh'] = safeConvertToStr(temperatureToStr, settingsClass.INVALID_TEMPERATURE_HIGH)
    
    # Determine what to set the switch to when entering the time of day to stop controlling the switch.
    settingsDict['SwitchStateAfterTimeOfDayStop'] = switchStateAfterTimeOfDayStop_toStr(settingsClass.SWITCH_STATE_AFTER_TIME_OF_DAY_STOP)
@@ -417,13 +433,43 @@ def classToDict(settingsClass, settingsDict):
    settingsDict['DeviceName'] = settingsClass.DEVICE_NAME
    settingsDict['DeviceColor'] = settingsClass.DEVICE_COLOR
 
+def fixOldJsonVersions(jsonToFix):
+   fixed = False
+   try:
+      onTemp  = float(jsonToFix['SwitchOnTemp'])
+      offTemp = float(jsonToFix['SwitchOffTemp'])
+      jsonToFix['SwitchTemperature']  = safeConvertToStr( temperatureToStr, (onTemp+offTemp) / 2.0 )
+      jsonToFix['SwitchComfortRange'] = safeConvertToStr( temperatureToStr, abs(onTemp-offTemp) )
+      if onTemp > offTemp:
+         jsonToFix['SwitchHeatCool'] = safeConvertToStr(int, -1) # Cool
+      elif onTemp < offTemp:
+         jsonToFix['SwitchHeatCool'] = safeConvertToStr(int, 1)  # Heat
+      else:
+         jsonToFix['SwitchHeatCool'] = safeConvertToStr(int, 0)  # Off
+
+      del jsonToFix['SwitchOnTemp']
+      del jsonToFix['SwitchOffTemp']
+      fixed = True
+   except:
+      pass
+   return jsonToFix
+
+
 def loadSettingsFromJson():
    global currentTempCtrlSettings
    global currentTempCtrlDict
 
    success = True
    try:
-      currentTempCtrlDict = json.loads(readWholeFile(JSON_PATH))
+      jsonFromFileSystem = json.loads(readWholeFile(JSON_PATH))
+
+      # Fix if needed (i.e. check if importing on older version of the .json file)
+      if fixOldJsonVersions(jsonFromFileSystem):
+         writeWholeFile(JSON_PATH, json.dumps(jsonFromFileSystem, indent=3)) # Store off the new version 
+
+      # Copy to the Global Variable
+      currentTempCtrlDict = jsonFromFileSystem
+
       success = dictToClass(currentTempCtrlDict, currentTempCtrlSettings)[0] # [0] is allValid
    except:
       success = False
@@ -444,8 +490,9 @@ def printTempCtrlSettings(tempCtrlSettings):
       logMsg("Min Switch Retry Time   = " + str(tempCtrlSettings.MIN_TIME_BETWEEN_RETRYING_SWITCH_CHANGE) + timeUnit)
       logMsg("Min Switch Toggle Time  = " + str(tempCtrlSettings.MIN_TIME_BETWEEN_CHANGING_SWITCH_STATE) + timeUnit)
       logMsg("Smart Plug Ip Addr      = " + str(tempCtrlSettings.SMART_PLUG_IP_ADDR))
-      logMsg("Off Temp                = " + str(tempCtrlSettings.SWITCH_OFF_TEMPERATURE) + tempUnit)
-      logMsg("On Temp                 = " + str(tempCtrlSettings.SWITCH_ON_TEMPERATURE) + tempUnit)
+      logMsg("Heat/Cool/Off           = " + heatCool_toStr(tempCtrlSettings.SWITCH_HEAT_COOL))
+      logMsg("Comfort Range           = " + str(tempCtrlSettings.SWITCH_COMFORT_RANGE) + tempUnit)
+      logMsg("Temperature             = " + str(tempCtrlSettings.SWITCH_TEMPERATURE) + tempUnit)
       logMsg("Stop Time               = " + timeIntToStr(tempCtrlSettings.TIME_OF_DAY_TO_STOP, True))
       logMsg("Start Time              = " + timeIntToStr(tempCtrlSettings.TIME_OF_DAY_TO_START, True))
       logMsg("Device Color            = " + str(tempCtrlSettings.DEVICE_COLOR))
@@ -538,7 +585,6 @@ def getIpcResonseJsonStr():
 
 
 def ipcMessageCallback(objects):
-   global currentTempCtrlDict
    global currentTempCtrlSettings
 
    global settingsMutex
@@ -627,15 +673,21 @@ def determineIfSwitchStateNeedsToBeSet(temperature, tempCtrlSettings):
    retVal = SWITCH_STATE_NO_CHANGE
    
    try:
-      if tempCtrlSettings.SWITCH_ON_TEMPERATURE > tempCtrlSettings.SWITCH_OFF_TEMPERATURE:
-         if temperature >= tempCtrlSettings.SWITCH_ON_TEMPERATURE:
+      deltaTemp = tempCtrlSettings.SWITCH_COMFORT_RANGE / 2.0
+
+      if tempCtrlSettings.SWITCH_HEAT_COOL < 0: # Cool
+         onTemp  = tempCtrlSettings.SWITCH_TEMPERATURE + deltaTemp
+         offTemp = tempCtrlSettings.SWITCH_TEMPERATURE - deltaTemp
+         if temperature >= onTemp:
             retVal = SWITCH_STATE_ON
-         elif temperature <= tempCtrlSettings.SWITCH_OFF_TEMPERATURE:
+         elif temperature <= offTemp:
             retVal = SWITCH_STATE_OFF
-      else:
-         if temperature <= tempCtrlSettings.SWITCH_ON_TEMPERATURE:
+      elif tempCtrlSettings.SWITCH_HEAT_COOL > 0: # Heat
+         onTemp  = tempCtrlSettings.SWITCH_TEMPERATURE - deltaTemp
+         offTemp = tempCtrlSettings.SWITCH_TEMPERATURE + deltaTemp
+         if temperature <= onTemp:
             retVal = SWITCH_STATE_ON
-         elif temperature >= tempCtrlSettings.SWITCH_OFF_TEMPERATURE:
+         elif temperature >= offTemp:
             retVal = SWITCH_STATE_OFF
    except:
       logMsg("Failed to determine if the switch state needs to be set.")

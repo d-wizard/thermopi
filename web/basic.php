@@ -7,6 +7,7 @@
 <html>
 <head>
 <link rel="stylesheet" type="text/css" href="thermo.css">
+<link rel="stylesheet" type="text/css" href="heatCoolSlider.css">
 <meta name="viewport" content="width=device-width" />
 <style>
 </style>
@@ -23,8 +24,9 @@
       $basicCmds = array(
          'TimeOfDayToStart',
          'TimeOfDayToStop',
-         'SwitchOnTemp',
-         'SwitchOffTemp'
+         'SwitchTemperature',
+         'SwitchComfortRange',
+         'SwitchHeatCool'
       );
 
       $pyArgsStr = "";
@@ -47,7 +49,7 @@
       }
 
    ?>
-       
+
    <div class="devicebar">
       <table style="width:100%"><tr>
          <td><?php echo $DeviceName;?></td>
@@ -79,23 +81,57 @@
                <td colspan="2"><input name="TimeOfDayToStop_val" type="time" value="<?php echo $TimeOfDayToStop;?>" /></td>
             </tr>
             <tr>
-               <td>On Temp</td>
-               <td width="1"><input name="SwitchOnTemp_val" type="number" value="<?php echo $SwitchOnTemp;?>" /></td>
+               <td>Temperature</td>
+               <td width="1"><input name="SwitchTemperature_val" type="number" step="0.1" value="<?php echo $SwitchTemperature;?>" /></td>
                <td>°F</td>
             </tr>
             <tr>
-               <td>Off Temp</td>
-               <td width="1"><input name="SwitchOffTemp_val" type="number" value="<?php echo $SwitchOffTemp;?>" /></td>
+               <td>Comfort Range</td>
+               <td width="1"><input name="SwitchComfortRange_val" type="number" step="0.1" min="0.1" value="<?php echo $SwitchComfortRange;?>" /></td>
                <td>°F</td>
             </tr>
             <tr>
+               <td>Cool / Off / Heat</td>
+               <td colspan="2"><center><div class="slidecontainer">
+                  <input name="SwitchHeatCool_val" type="range" min="-1" max="1" value="<?php echo $SwitchHeatCool;?>" class="slider" id="thermoType">
+               </div></center></td>
+            </tr>
                <td colspan="3"><center><input name="submit_basic" type="submit" value="Update Basic Settings" /></center></td>
             </tr>
          </table>
-
+         <br><hr>
          <br><img src="<?php echo $hotColdIconImg48;?>">
       </form>
 
    </center>
    </body>
+
+<!-- Use javascript to dynamically control the Heat/Cool Thermostat Slider -->
+<script>
+   // Store off the Heat/Cool Thermostat Slider.
+   var v_thermoSlider = document.querySelector('#thermoType');
+
+   function setColor(){
+      if(v_thermoSlider.value == -1) {
+         v_thermoSlider.style.background = "#99beff";
+      } else if(v_thermoSlider.value == 1) {
+         v_thermoSlider.style.background = "#ff8787";
+      } else {
+         v_thermoSlider.style.background = "#bfbfbf";
+      }
+   }
+
+   // Update the slider color dynamically.
+   v_thermoSlider.addEventListener('change', function() {
+      setColor();
+      }, false);
+
+   v_thermoSlider.addEventListener('input', function() {
+      setColor();
+      }, false);
+
+   setColor(); // Set the color right away
+
+</script>
+
 </html>
