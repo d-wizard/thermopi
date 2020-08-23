@@ -146,15 +146,20 @@
          </table>
          <br><hr>
 
-         <h1>Time Settings</h1>
+         <h1>Temperature Settings</h1>
          <table cellpadding="5">
+            <tr>
+               <td>Comfort Range</td>
+               <td width="1"><input name="SwitchComfortRange_val" type="number" step="0.1" min="0.1" value="<?php echo $SwitchComfortRange;?>" /></td>
+               <td>°F</td>
+            </tr>
             <tr>
                <td>Time Between Temp Checks</td>
                <td><input name="TimeBetweenTempCheck_val" type="number" value="<?php echo $TimeBetweenTempCheck;?>" /></td>
                <td>seconds</td>
             </tr>
             <tr>
-               <td colspan="3"><center><input name="submit_time" type="submit" value="Update Time Settings" /></center></td>
+               <td colspan="3"><center><input name="submit_time" type="submit" value="Update Temperature Settings" /></center></td>
             </tr>
          </table>
          <br><hr>

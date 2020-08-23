@@ -86,11 +86,6 @@
                <td>°F</td>
             </tr>
             <tr>
-               <td>Comfort Range</td>
-               <td width="1"><input name="SwitchComfortRange_val" type="number" step="0.1" min="0.1" value="<?php echo $SwitchComfortRange;?>" /></td>
-               <td>°F</td>
-            </tr>
-            <tr>
                <td>Cool / Off / Heat</td>
                <td colspan="2"><center><div class="slidecontainer">
                   <input name="SwitchHeatCool_val" type="range" min="-1" max="1" value="<?php echo $SwitchHeatCool;?>" class="slider" id="thermoType">
