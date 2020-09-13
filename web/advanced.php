@@ -24,6 +24,7 @@
       // 
       $timeCmds = array(
          'TimeBetweenTempCheck',
+         'SwitchComfortRange',
       );
 
       // 

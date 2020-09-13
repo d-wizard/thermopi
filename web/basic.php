@@ -25,7 +25,6 @@
          'TimeOfDayToStart',
          'TimeOfDayToStop',
          'SwitchTemperature',
-         'SwitchComfortRange',
          'SwitchHeatCool'
       );
 
