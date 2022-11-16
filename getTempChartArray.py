@@ -81,7 +81,17 @@ def getNowTimeUnix():
    return int(nowUnixTime)
 
 def lineToTime(line):
-   return int(line.split(",")[0])
+   try:
+      timePart = line.split(",")[0]
+   except:
+      return None
+
+   try:
+      return int(timePart)
+   except ValueError:
+      timePart = timePart.replace('\x00', '') # I've seen weird situations where a bunch of 0 bytes get mixed in.
+      return int(float(timePart)) # Some google results suggest converting to float before int, IDK. This except shouldn't be getting hit very often...
+
 
 def findTimeIndex(lines, timeLimit):
    numLines = len(lines)
