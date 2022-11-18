@@ -1,0 +1,10 @@
+{
+    "TopicName": "test/temperature",
+    "NumPointsToAverage": 10,
+    "LogFilePath": "/path/to/log/file.log",
+    "MqttBrokerIp": "127.0.0.1",
+    "MqttBrokerPort": 8883,
+    "MqttUserName": "",
+    "MqttPassword": "",
+    "MqttClientId": ""
+}

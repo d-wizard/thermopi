@@ -9,11 +9,6 @@ import fcntl
 ################################################################################
 # Constant Variables
 ################################################################################
-THIS_SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
-THIS_SCRIPT_FILENAME_NO_EXT = os.path.splitext(os.path.realpath(__file__))[0] 
-TEMPERATURE_LOG_PATH = os.path.join(THIS_SCRIPT_DIR, 'temperature.log')
-TEMPERATURE_LOCK_PATH = os.path.join(THIS_SCRIPT_DIR, 'temperature.lock')
-
 LOG_NEW_LINE = "\n"
 LOG_MAX_TIME = 60*60*24*30 # 1 Month
 LOG_MAX_TIME_TIME_TO_LEAVE_AFTER_TRIM = 60*60*24*14 # 2 Weeks
@@ -46,7 +41,8 @@ def writeWholeFile(path, fileText):
    except:
       pass
 
-def lockFile(fileToLock):
+def lockFile(logFilePath):
+   fileToLock = os.path.splitext(os.path.realpath(logFilePath))[0] + ".lock"
    fd = open(fileToLock, 'w')
    fcntl.lockf(fd, fcntl.LOCK_EX)
    return fd
@@ -162,7 +158,7 @@ def getPrintStr(lines):
    return retStr
 
 
-def updateTemperatureLogFile(temperature, switchState, timeOfLastTempWrite):
+def updateTemperatureLogFile(temperature, switchState, timeOfLastTempWrite, logFilePath):
    nowUnixTime = getNowTimeUnix()
 
    if (nowUnixTime - timeOfLastTempWrite) >= TIME_BETWEEN_LOG_UPDATES:
@@ -171,12 +167,12 @@ def updateTemperatureLogFile(temperature, switchState, timeOfLastTempWrite):
       switchStatePrint = "1" if (switchState != None and switchState == True) else "0"
       logPrint = str(int(nowUnixTime)) + ",{:.1f}".format(temperature) + "," + switchStatePrint + LOG_NEW_LINE
 
-      lockFd = lockFile(TEMPERATURE_LOCK_PATH)
-      appendFile(TEMPERATURE_LOG_PATH, logPrint)
+      lockFd = lockFile(logFilePath)
+      appendFile(logFilePath, logPrint)
 
       # Limit the log from getting too big
       try:
-         logLines = readWholeFile(TEMPERATURE_LOG_PATH).split(LOG_NEW_LINE)
+         logLines = readWholeFile(logFilePath).split(LOG_NEW_LINE)
          # remove empty line at end.
          if logLines[-1] == "":
             logLines = logLines[:-1]
@@ -185,7 +181,7 @@ def updateTemperatureLogFile(temperature, switchState, timeOfLastTempWrite):
          if (nowUnixTime - oldestTime) > LOG_MAX_TIME:
             indexToKeep = findTimeIndex(logLines, nowUnixTime - LOG_MAX_TIME_TIME_TO_LEAVE_AFTER_TRIM)
             logLines = logLines[indexToKeep:]
-            writeWholeFile(TEMPERATURE_LOG_PATH, LOG_NEW_LINE.join(logLines)+LOG_NEW_LINE)
+            writeWholeFile(logFilePath, LOG_NEW_LINE.join(logLines)+LOG_NEW_LINE)
       except:
          pass
 
@@ -201,11 +197,18 @@ if __name__== "__main__":
    parser = argparse.ArgumentParser()
    parser.add_argument("-t", type=int, action="store", dest="chartTime", help="Chart Time", default=3600)
    parser.add_argument("-n", type=int, action="store", dest="numPoints", help="Num Points", default=100)
+   parser.add_argument("-p", type=str, action="store", dest="logPath", help="Path to Log File", default=None)
    args = parser.parse_args()
 
-   # Process the Temperature Log File
-   lockFd = lockFile(TEMPERATURE_LOCK_PATH)
-   temperatureLogFile = readWholeFile(TEMPERATURE_LOG_PATH)
+   if args.logPath != None and os.path.isfile(args.logPath):
+      pass
+   else:
+      exit()
+
+
+   # Process the Log File
+   lockFd = lockFile(args.logPath)
+   temperatureLogFile = readWholeFile(args.logPath)
    unlockFile(lockFd)
 
    lines = temperatureLogFile.split(LOG_NEW_LINE)
@@ -222,4 +225,4 @@ if __name__== "__main__":
 
       lines = getLinesToChart(lines, args.numPoints)
       
-      print getPrintStr(lines)
+      print(getPrintStr(lines))
