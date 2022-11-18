@@ -104,84 +104,17 @@ def logMsg(printMsg, unimportantMsg = False):
    appendFile(logPath, logMsg + logNewLine)
    limitLogSize(logPath, True, logMaxLogLines_long, logLineToLeaveAfterTrim_long)
 
-def getCurrentTime():
-   uptime_seconds = None
-
+def strToFloat(inStr):
    try:
-      with open('/proc/uptime', 'r') as f:
-          uptime_seconds = float(f.readline().split()[0])
+      return float(inStr)
    except:
-      logMsg("Failed to get current time")
-
-   return uptime_seconds
+      return None
 
 
 
 ################################################################################
 # JSON Functions
 ################################################################################
-def strToTimeInt(inStr):
-   try:
-      iniTimeStr = inStr.lower()
-
-      hour = 0
-      minute = 0
-      isPm = None
-
-      # Determine AM / PM
-      if iniTimeStr[-2:] == "pm":
-         isPm = True
-      elif iniTimeStr[-2:] == "am":
-         isPm = False
-      if isPm != None:
-         iniTimeStr = iniTimeStr[:-2]
-      
-      if ':' in iniTimeStr:
-         hour = int(iniTimeStr.split(':')[0])
-         minute = int(iniTimeStr.split(':')[1])
-      else:
-         totalTime = int(iniTimeStr)
-         if totalTime >= 100:
-            hour = totalTime / 100
-            minute = totalTime % 100
-         elif totalTime < 24:
-            hour = totalTime
-            minute = 0
-         else:
-            # this one seem unlikely to get to
-            hour = 0
-            minute = totalTime
-         
-      if hour >= 12 and isPm == None:
-         isPm = True
-      if hour >= 12:
-         hour -= 12
-      if isPm:
-         hour += 12
-
-      return hour*100 + minute
-   except:
-      raise ValueError('Invalid Time Read.')
-      return None
-
-def timeIntToStr(timeInt, useAmPm = False):
-   if useAmPm: # 12 Hour with AM / PM
-      amPmStr = " AM"
-      hour = int(timeInt / 100)
-      minute = int(timeInt % 100)
-      if hour >= 12:
-         amPmStr = " PM"
-         if hour >= 13:
-            hour -= 12
-      elif hour == 0:
-         hour = 12
-   else: # 24 hour that the web server wants.
-      amPmStr = ""
-      hour = int(timeInt / 100)
-      minute = int(timeInt % 100)
-
-   return "{:02d}:{:02d}".format(hour, minute) + amPmStr
-
 def tryDictSettingToType(convertFunc, settingsDict, dictStr, origVal):
    dictEntryExists = False
    convertFuncSuccess = False
@@ -248,34 +181,6 @@ def dictToClass(settingsDict, settingsClass):
    [allValid, allAvailValid, anyValid] = getValidDictToClass(allValid, allAvailValid, anyValid, exists, converted)
 
    return [allValid, allAvailValid, anyValid]
-
-def floatToIntStr(floatVal):
-   if floatVal > 0.0:
-      return str(int(floatVal + 0.5))
-   elif floatVal < 0.0:
-      return str(-int(-floatVal + 0.5))
-   else:
-      return str(0)
-
-def temperatureToStr(tempVal):
-   if float(int(tempVal)) == float(tempVal):
-      return str(int(tempVal))
-   else:
-      return "{:.1f}".format(tempVal)
-
-def safeConvertToStr(convertFunc, inVal, failRetVal = ""):
-   retVal = failRetVal
-   try:
-      retVal = convertFunc(inVal)
-   except:
-      pass
-   return retVal
-
-def strToFloat(inStr):
-   try:
-      return float(inStr)
-   except:
-      return None
 
 def loadSettingsFromJson():
    global currentSettings
