@@ -249,8 +249,10 @@ def mqttConnect(ctrlSettings):
 
 def mqttSubscribe(client: mqtt_client, ctrlSettings):
    def mqtt_onMessage(client, userdata, msg):
+      #logMsg(msg.payload.decode())
       logMqttData(msg.payload.decode(), ctrlSettings)
 
+   logMsg("Subscribing to topic: " + ctrlSettings.TopicName)
    client.subscribe(ctrlSettings.TopicName)
    client.on_message = mqtt_onMessage
 
@@ -268,10 +270,33 @@ if goodSettings == False:
    logMsg("##### Invalid Starting Settings - Waiting for valid settings.")
    exit(0)
 
-# Run MQTT
-mqttClient = mqttConnect(currentSettings)
-mqttClient.loop_start()
-mqttSubscribe(mqttClient, currentSettings)
+# Connect to MQTT Broker
+success = False
+while not success:
+   try:
+      mqttClient = mqttConnect(currentSettings)
+      success = True
+   except:
+      time.sleep(15)
+
+# Start the Client loop
+success = False
+while not success:
+   try:
+      mqttClient.loop_start()
+      success = True
+   except:
+      time.sleep(15)
+
+# Subscribe to the topic(s)
+success = False
+while not success:
+   try:
+      mqttSubscribe(mqttClient, currentSettings)
+      success = True
+   except:
+      time.sleep(15)
+
 
 # Start Forever Loop (everything is done in other threads).
 while 1:

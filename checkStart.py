@@ -4,17 +4,17 @@ import time
 
 BIN_DIR = os.path.dirname(os.path.realpath(__file__))
 
-SCRIPT_NAME = 'temperatureControlSwitch.py'
+SCRIPT_NAME = 'mqttLogger.py'
 SCRIPT_PATH    = os.path.join(BIN_DIR, SCRIPT_NAME)
-ERROR_LOG_PATH = os.path.join(BIN_DIR, 'temperatureControlSwitch.stderr')
+ERROR_LOG_PATH = os.path.join(BIN_DIR, 'mqttLogger.stderr')
 
-START_CMD = 'python ' + SCRIPT_PATH + ' 2>> ' + ERROR_LOG_PATH + ' &'
+START_CMD = 'python3 ' + SCRIPT_PATH + ' 2>> ' + ERROR_LOG_PATH + ' &'
 
 # Add path to the python file needed to run this script (e.g. getAllProcesses)
 sys.path.append(os.path.join(BIN_DIR, '..', 'PythonLibraries'))
 from getAllProcesses import getProcInfo
 
-procInfo = getProcInfo('python')
+procInfo = getProcInfo('python3')
 
 running = False
 for p in procInfo:
