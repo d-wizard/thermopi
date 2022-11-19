@@ -1,15 +1,15 @@
 <?php
-   // Get the current settings.
-   include 'setGetSettings.php';
-   setGet("");
+  // Get the current settings.
+  $thisScriptDir = dirname(__FILE__);
+  $thermoPythonDir = $thisScriptDir."/../"; # The directory with all the python scripts is up one directory from this script.
+  $topic = "test/temperature"
 ?>
 
 <html>
   <head>
     <link rel="stylesheet" type="text/css" href="thermo.css">
     <meta name="viewport" content="width=device-width" />
-    <title><?php echo $DeviceName;?></title>
-    <link rel="icon" href="<?php echo $hotColdIconImgIcon;?>">
+    <title><?php echo "Topic: ".$topic;?></title>
     
     <?php
         /////////////////////////////////////////////////////////
@@ -20,6 +20,7 @@
 
         $time = 3600*24;
         $numPoints = 600;
+        $logFile = "###";
 
         if(isset($_GET["submit_1hr"]))
         {
@@ -81,7 +82,7 @@
       function drawChart() {
         var data = google.visualization.arrayToDataTable([
           [{type: 'datetime', label: 'Time'}, 'Switch State', 'Temperature (°F)'],
-          <?php echo shell_exec($pythonScript." -t ".$time." -n ".$numPoints);?>
+          <?php echo shell_exec($pythonScript." -t ".$time." -n ".$numPoints." -p ".$logFile);?>
         ]);
 
         var options = {
@@ -117,18 +118,6 @@
     </script>
   </head>
    <body style='background-color : <?php echo $DeviceColor;?>' >
-   <div class="devicebar">
-      <table style="width:100%"><tr>
-         <td><?php echo $DeviceName;?></td>
-         <td><img src="<?php echo $hotColdIconImg17;?>"> <?php echo $currentTemperature;?></td>
-      </tr></table>
-   </div>
-   <div class="navbar">
-      <a href="status.php">Status</a>
-      <a href="basic.php">Settings</a>
-      <a href="graph.php">Graph</a>
-      <a href="log.php">Log</a>
-   </div>
    <br><br>
    <br><br>
    <br><br>
@@ -141,7 +130,7 @@
       <input name="submit_3day" type="submit" value="3 Day" />
       <input name="submit_7day" type="submit" value="7 Day" />
     </form>
-    <h3><?php echo $titleStr;?></h3>
+    <h3><?php echo "Topic: ".$topic." - ".$titleStr;?></h3>
     <div id="curve_chart_with_switch"></div>
     </center>
   </body>
