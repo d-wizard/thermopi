@@ -203,25 +203,37 @@ def logMqttData(mqttData, ctrlSettings):
 
    try:
       logFileVal = None
+      success = True
       if ctrlSettings.NumPointsToAverage != None and ctrlSettings.NumPointsToAverage > 0:
-         global mqttStoreValuesForAverage
-         mqttStoreValuesForAverage.append(mqttData)
+         try:
+            global mqttStoreValuesForAverage
+            mqttStoreValuesForAverage.append(mqttData)
 
-         # Remove old values from the list.
-         if len(mqttStoreValuesForAverage) >= ctrlSettings.NumPointsToAverage:
-            mqttStoreValuesForAverage = mqttStoreValuesForAverage[-ctrlSettings.NumPointsToAverage:]
+            # Remove old values from the list.
+            if len(mqttStoreValuesForAverage) >= ctrlSettings.NumPointsToAverage:
+               mqttStoreValuesForAverage = mqttStoreValuesForAverage[-ctrlSettings.NumPointsToAverage:]
 
-         # Compute the average temperature from all the values in the list.
-         averageSum = 0
-         for temp in mqttStoreValuesForAverage:
-            averageSum += temp
-         logFileVal = averageSum / len(mqttStoreValuesForAverage)
+            # Compute the average temperature from all the values in the list.
+            averageSum = 0
+            for temp in mqttStoreValuesForAverage:
+               averageSum += temp
+            logFileVal = averageSum / len(mqttStoreValuesForAverage)
+         except:
+            success = False
 
       else:
          logFileVal = mqttData
 
-      global lastMqttLogTime
-      lastMqttLogTime = updateTemperatureLogFile(logFileVal, 0, lastMqttLogTime, ctrlSettings.LogFilePath)
+      # Convert from Celsius to Fahrenheit 
+      try:
+         logFileVal = float(logFileVal) * 9.0 / 5.0 + 32.0
+      except:
+         success = False
+      
+      # Log the temperature data
+      if success:
+         global lastMqttLogTime
+         lastMqttLogTime = updateTemperatureLogFile(logFileVal, 0, lastMqttLogTime, ctrlSettings.LogFilePath)
    except:
       logMsg("Failed somewhere in logging MQTT Data.")
 
