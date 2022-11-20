@@ -98,9 +98,10 @@ if __name__== "__main__":
 
    procInfo = getProcInfo('python3')
 
+   # Check if the script is already running.
    running = False
    for p in procInfo:
-      if THIS_SCRIPT_FILENAME in p.cmds and pathToScriptCmd in p.cmds: # Don't include this process in the check.
+      if pathToScriptCmd in p.cmds: # Don't include this process in the check.
          # Found the process running this script right now. Skip past to the next process.
          pass
       else:
