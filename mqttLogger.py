@@ -224,9 +224,9 @@ def logMqttData(mqttData, ctrlSettings):
       else:
          logFileVal = mqttData
 
-      # Convert from Celsius to Fahrenheit 
+      # Make sure its a number
       try:
-         logFileVal = float(logFileVal) * 9.0 / 5.0 + 32.0
+         logFileVal = float(logFileVal)
       except:
          success = False
       
