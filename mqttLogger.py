@@ -276,6 +276,9 @@ def mqttSubscribe(client: mqtt_client, ctrlSettings):
 # Initialization
 logMsg("##### Starting MQTT Logger #####")
 
+# Make sure to start random number generator at a new point each time this is run.
+random.seed()
+
 goodSettings = loadSettingsFromJson()
 
 if goodSettings == False:
