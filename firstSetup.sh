@@ -2,16 +2,18 @@
 
 chmod 755 .
 
-touch changeSettings.log
-chmod 666 changeSettings.log
+# Make directory for log file
+# mkdir -p /path/to/log/file/directory
 
-chmod 755 changeSettings.py
-chmod 755 ipc.py
+# Make lock file for log
+# touch /path/to/log/file.lock
 
-chmod 755 getTempChartArray.py
-touch temperature.lock
-chmod 666 temperature.lock
+# Make sure log files are accessable
+# chmod 777 -R /path/to/base/log/directory
 
-touch web/tempCtrlSwitch.log
+# Make sure web stuff is accessable
 chmod 755 web
 chmod 644 web/*
+
+# Mount to webserver
+# ln -nfs ${PWD}/web /path/to/webserver
