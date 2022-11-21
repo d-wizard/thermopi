@@ -1,6 +1,10 @@
 #!/bin/bash
 
+# Make this directory accessable
 chmod 755 .
+
+# Make the Web Graph generator script accessable.
+chmod 755 getTempChartArray.py
 
 # Make directory for log file
 # mkdir -p /path/to/log/file/directory
