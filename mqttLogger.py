@@ -2,6 +2,7 @@ import os
 import time
 import json
 import random
+import argparse
 from datetime import datetime
 
 from paho.mqtt import client as mqtt_client
@@ -31,8 +32,7 @@ currentSettings = topicLogSettings()
 # Constant Variables
 ################################################################################
 THIS_SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
-THIS_SCRIPT_FILENAME_NO_EXT = os.path.splitext(os.path.realpath(__file__))[0] 
-JSON_PATH = THIS_SCRIPT_FILENAME_NO_EXT + '.json'
+THIS_SCRIPT_FILENAME_NO_EXT = os.path.splitext(os.path.realpath(__file__))[0]
 
 
 ################################################################################
@@ -182,12 +182,12 @@ def dictToClass(settingsDict, settingsClass):
 
    return [allValid, allAvailValid, anyValid]
 
-def loadSettingsFromJson():
+def loadSettingsFromJson(pathToJson):
    global currentSettings
 
    success = True
    try:
-      jsonFromFileSystem = json.loads(readWholeFile(JSON_PATH))
+      jsonFromFileSystem = json.loads(readWholeFile(pathToJson))
       success = dictToClass(jsonFromFileSystem, currentSettings)[0] # [0] is allValid
    except:
       success = False
@@ -276,10 +276,19 @@ def mqttSubscribe(client: mqtt_client, ctrlSettings):
 # Initialization
 logMsg("##### Starting MQTT Logger #####")
 
+# Config argparse
+parser = argparse.ArgumentParser()
+parser.add_argument("-c", type=str, action="store", dest="configJsonPath", help="Path to the JSON with configuration parameters.", default=None)
+args = parser.parse_args()
+
+if(args.configJsonPath == None):
+   logMsg("Need to specify path to the config JSON.")
+   exit(0)
+
 # Make sure to start random number generator at a new point each time this is run.
 random.seed()
 
-goodSettings = loadSettingsFromJson()
+goodSettings = loadSettingsFromJson(args.configJsonPath)
 
 if goodSettings == False:
    logMsg("##### Invalid Starting Settings - Waiting for valid settings.")

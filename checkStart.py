@@ -79,8 +79,7 @@ def getProcInfo(procName):
 if __name__== "__main__":
    # Config argparse
    parser = argparse.ArgumentParser()
-   pathToScriptCmd = "--pathToScript"
-   parser.add_argument(pathToScriptCmd,  type=str, action="store", dest="scriptPath", help="Path to the script to run.", default=None)
+   parser.add_argument("--pathToScript", type=str, action="store", dest="scriptPath", help="Path to the script to run.", default=None)
    parser.add_argument("--argsToScript", type=str, action="store", dest="args", help="Command line arguments.", default=None)
    args = parser.parse_args()
 
@@ -88,35 +87,34 @@ if __name__== "__main__":
       print("Need to specify path to the script to run.")
       exit(0)
 
-   SCRIPT_PATH = os.path.realpath(args.scriptPath)
-   SCRIPT_DIR, SCRIPT_NAME = os.path.split(SCRIPT_PATH)
+   SCRIPT_PATH = args.scriptPath
    ERROR_LOG_PATH = SCRIPT_PATH + '.stderr'
-
    ARGS = "" if args.args == None else " " + args.args # Add extra space to separate command from args.
 
-   START_CMD = 'python3 ' + SCRIPT_PATH + ARGS + ' 2>> ' + ERROR_LOG_PATH + ' &'
-
-   procInfo = getProcInfo('python3')
+   PYTHON = "python3"
+   START_CMD = PYTHON + ' ' + SCRIPT_PATH + ARGS + ' 2>> ' + ERROR_LOG_PATH + ' &'
 
    # Check if the script is already running.
    running = False
+   procInfo = getProcInfo(PYTHON)
    for p in procInfo:
-      if pathToScriptCmd in p.cmds: # Don't include this process in the check.
-         # Found the process running this script right now. Skip past to the next process.
+      try:
+         if SCRIPT_PATH in p.cmds:
+            # Check if args match
+            if args.args != None:
+               thisCmdArgs = " ".join(p.cmds[1:]) # Combine everything after the python script path into a single string.
+               if thisCmdArgs == args.args:
+                  running = True # The args match. This must be the same script and arguments.
+            else:
+               running = True # No args specified. This must be the same script.
+
+            if running:
+               break
+      except:
          pass
-      else:
-         if SCRIPT_NAME in p.cmds:
-            running = True
-         else:
-            for cmd in p.cmds:
-               if SCRIPT_NAME in cmd:
-                  running = True
 
    if not running:
-      print(START_CMD)
+      print("Running CMD: " + START_CMD)
       os.system(START_CMD)
-      
-
-
    
 
