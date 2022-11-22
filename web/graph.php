@@ -2,7 +2,6 @@
   // Get the current settings.
   $thisScriptDir = dirname(__FILE__);
   $thermoPythonDir = $thisScriptDir."/../"; # The directory with all the python scripts is up one directory from this script.
-  $topic = "test/temperature"
 ?>
 
 <html>
@@ -57,6 +56,12 @@
           $numPoints = 2000;
           $titleStr = "Temperature - 7 Days";
         }
+
+        if (isset($_POST['show_dropdown_value']))
+        {
+          $topic = $_POST['dropdown'];
+        }
+
     ?>
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script type="text/javascript">
@@ -121,6 +126,14 @@
    <br><br>
    <br><br>
     <center>
+
+    <form action="graph.php" method="post">
+      <select name="dropdown">
+        <option value="xxx/xxx/xxx">xxx/xxx/xxx</option>
+      </select>
+      <input type="submit" name="show_dropdown_value" value="Update"/>
+    </form>
+
     <form action="graph.php" method="get">
       <input name="submit_1hr" type="submit" value="1 Hr" />
       <input name="submit_4hr" type="submit" value="4 Hr" />
