@@ -15,12 +15,11 @@
         /////////////////////////////////////////////////////////
         // This code will run every time something happens.
         /////////////////////////////////////////////////////////        
-        $pythonScript = "python ".$thermoPythonDir."getTempChartArray.py";
+        $pythonScript = "python3 ".$thermoPythonDir."getTempChartArray.py";
         $titleStr = "Temperature - 1 Day";
 
         $time = 3600*24;
         $numPoints = 600;
-        $logFile = "###";
 
         if(isset($_GET["submit_1hr"]))
         {
@@ -82,7 +81,7 @@
       function drawChart() {
         var data = google.visualization.arrayToDataTable([
           [{type: 'datetime', label: 'Time'}, 'Switch State', 'Temperature (°F)'],
-          <?php echo shell_exec($pythonScript." -t ".$time." -n ".$numPoints." -p ".$logFile);?>
+          <?php echo shell_exec($pythonScript." -c ".$time." -n ".$numPoints." -t ".$topic);?>
         ]);
 
         var options = {
