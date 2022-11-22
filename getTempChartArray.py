@@ -4,6 +4,7 @@ import math
 from datetime import datetime
 import argparse
 import fcntl
+import json
 
 
 ################################################################################
@@ -14,6 +15,8 @@ LOG_MAX_TIME = 60*60*24*30 # 1 Month
 LOG_MAX_TIME_TIME_TO_LEAVE_AFTER_TRIM = 60*60*24*14 # 2 Weeks
 TIME_BETWEEN_LOG_UPDATES = 30 # 30 seconds should be enough resolution
 
+THIS_SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
+TOPIC_PATH_JSON_NAME = "TopicLogPath.json"
 
 def readWholeFile(path):
    retVal = ""
@@ -189,26 +192,38 @@ def updateTemperatureLogFile(temperature, switchState, timeOfLastTempWrite, logF
 
    return timeOfLastTempWrite
 
+def getTopicLogFilePath(topicName):
+   try:
+      jsonFromFileSystem = json.loads(readWholeFile(os.path.join(THIS_SCRIPT_DIR, TOPIC_PATH_JSON_NAME)))
+
+      topicLogFilePath = os.path.join(jsonFromFileSystem["TopicLogBaseDir"], topicName + ".log")
+      if os.path.isfile(topicLogFilePath):
+         return topicLogFilePath
+   except:
+      pass
+
+   return None
 
 
 # Main start
 if __name__== "__main__":
    # Config argparse
    parser = argparse.ArgumentParser()
-   parser.add_argument("-t", type=int, action="store", dest="chartTime", help="Chart Time", default=3600)
+   parser.add_argument("-c", type=int, action="store", dest="chartTime", help="Chart Time", default=3600)
    parser.add_argument("-n", type=int, action="store", dest="numPoints", help="Num Points", default=100)
-   parser.add_argument("-p", type=str, action="store", dest="logPath", help="Path to Log File", default=None)
+   parser.add_argument("-t", type=str, action="store", dest="topicName", help="MQTT Topic", default=None)
    args = parser.parse_args()
 
-   if args.logPath != None and os.path.isfile(args.logPath):
-      pass
-   else:
+   if args.topicName == None:
       exit()
 
+   topicLogPath = getTopicLogFilePath(args.topicName)
+   if topicLogPath == None:
+      exit()
 
    # Process the Log File
-   lockFd = lockFile(args.logPath)
-   temperatureLogFile = readWholeFile(args.logPath)
+   lockFd = lockFile(topicLogPath)
+   temperatureLogFile = readWholeFile(topicLogPath)
    unlockFile(lockFd)
 
    lines = temperatureLogFile.split(LOG_NEW_LINE)

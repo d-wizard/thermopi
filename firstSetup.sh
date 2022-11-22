@@ -6,6 +6,9 @@ chmod 755 .
 # Make the Web Graph generator script accessable.
 chmod 755 getTempChartArray.py
 
+# Make Topic Log Path JSON accessable
+chmod 644 TopicLogPath.json
+
 # Make directory for log file
 # mkdir -p /path/to/log/file/directory
 
