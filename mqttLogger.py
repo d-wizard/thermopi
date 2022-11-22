@@ -4,9 +4,10 @@ import json
 import random
 import argparse
 from datetime import datetime
-
 from paho.mqtt import client as mqtt_client
+
 from getTempChartArray import updateTemperatureLogFile
+from getTempChartArray import getTopicLogFilePath
 
 
 ################################################################################
@@ -189,6 +190,12 @@ def loadSettingsFromJson(pathToJson):
    try:
       jsonFromFileSystem = json.loads(readWholeFile(pathToJson))
       success = dictToClass(jsonFromFileSystem, currentSettings)[0] # [0] is allValid
+
+      if not success and currentSettings.LogFilePath == None and currentSettings.TopicName != None:
+         # If LogFilePath wasn't specified, determine its value from the topic name and try again
+         jsonFromFileSystem["LogFilePath"] = getTopicLogFilePath(currentSettings.TopicName)
+         success = dictToClass(jsonFromFileSystem, currentSettings)[0] # [0] is allValid
+
    except:
       success = False
    return success
@@ -291,7 +298,7 @@ random.seed()
 goodSettings = loadSettingsFromJson(args.configJsonPath)
 
 if goodSettings == False:
-   logMsg("##### Invalid Starting Settings - Waiting for valid settings.")
+   logMsg("##### Invalid Starting Settings - exiting now.")
    exit(0)
 
 # Connect to MQTT Broker
