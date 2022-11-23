@@ -8,7 +8,6 @@
   <head>
     <link rel="stylesheet" type="text/css" href="thermo.css">
     <meta name="viewport" content="width=device-width" />
-    <title><?php echo "Topic: ".$topic;?></title>
     
     <?php
         /////////////////////////////////////////////////////////
@@ -158,13 +157,13 @@
         chart.draw(data, options);
       }
     </script>
+    <title><?php echo "Topic: ".$topic;?></title>
   </head>
    <body style='background-color : <?php echo $DeviceColor;?>' >
-   <br><br>
-   <br><br>
-   <br><br>
+   <br>
     <center>
 
+    <h3><?php echo "Topic: ".$topic." - ".$titleStr;?></h3>
     <form action="graph.php" method="get">
       <select name="Topic">
         <?php echo getTopicDropdownHtml();?>
@@ -179,7 +178,6 @@
       <input name="submit_3day" type="submit" value="3 Day" />
       <input name="submit_7day" type="submit" value="7 Day" />
     </form>
-    <h3><?php echo "Topic: ".$topic." - ".$titleStr;?></h3>
     <div id="curve_chart_with_switch"></div>
     </center>
   </body>
