@@ -10,13 +10,19 @@ chmod 755 getTempChartArray.py
 chmod 644 TopicLogPath.json
 
 # Make directory for log file
-# mkdir -p /path/to/log/file/directory
+# Make sure lock file / log file exist.
 
-# Make lock file for log
+# Make sure the log file and log file exist.
 # touch /path/to/log/file.lock
+# touch /path/to/log/file.log
 
 # Make sure log files are accessable
-# chmod 777 -R /path/to/base/log/directory
+chmod 777 $(find /path/to/base/log/directory -type d)
+chmod 666 $(find /path/to/base/log/directory -type f)
+
+# Make sure subscriptions are accessable
+chmod 755 subscriptions
+chmod 644 subscriptions/*
 
 # Make sure web stuff is accessable
 chmod 755 web
