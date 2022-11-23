@@ -13,53 +13,91 @@
     <?php
         /////////////////////////////////////////////////////////
         // This code will run every time something happens.
-        /////////////////////////////////////////////////////////        
+        /////////////////////////////////////////////////////////
+        $topics = array(
+          'xxx/xxx/xxxxx',
+          'yyy/yyy/yyyyy'
+        );
+        $topic = $topics[0]; // Default to first in array.
+
         $pythonScript = "python3 ".$thermoPythonDir."getTempChartArray.py";
         $titleStr = "Temperature - 1 Day";
 
         $time = 3600*24;
         $numPoints = 600;
+        $updateButtonSubmitName  = "update_topic";
 
         if(isset($_GET["submit_1hr"]))
         {
           $time = 3600;
           $numPoints = 100;
           $titleStr = "Temperature - 1 Hr";
+          $updateButtonSubmitName = "submit_1hr";
         }
         if(isset($_GET["submit_4hr"]))
         {
           $time = 3600*4;
           $numPoints = 400;
           $titleStr = "Temperature - 4 Hrs";
+          $updateButtonSubmitName = "submit_4hr";
         }
         if(isset($_GET["submit_12hr"]))
         {
           $time = 3600*12;
           $numPoints = 500;
           $titleStr = "Temperature - 12 Hrs";
+          $updateButtonSubmitName = "submit_12hr";
         }
         if(isset($_GET["submit_1day"]))
         {
           $time = 3600*24;
           $numPoints = 600;
           $titleStr = "Temperature - 1 Day";
+          $updateButtonSubmitName = "submit_1day";
         }
         if(isset($_GET["submit_3day"]))
         {
           $time = 3600*24*3;
           $numPoints = 800;
           $titleStr = "Temperature - 3 Days";
+          $updateButtonSubmitName = "submit_3day";
         }
         if(isset($_GET["submit_7day"]))
         {
           $time = 3600*24*7;
           $numPoints = 2000;
           $titleStr = "Temperature - 7 Days";
+          $updateButtonSubmitName = "submit_7day";
+        }
+        
+        if(isset($_GET["Topic"]))
+        {
+          $topic = $_GET['Topic'];
         }
 
-        if (isset($_POST['show_dropdown_value']))
+        function getTopicDropdownHtml()
         {
-          $topic = $_POST['dropdown'];
+            global $topics;
+            global $topic;
+            $selectedVal = $topic;
+
+            # Generate the dropdown HTML code, making sure the current value is at the top (there is probably a better way to do this).
+            $dropDownHtml = "<option value=".$selectedVal.">".$selectedVal."</option>";
+            for($i = 0; $i < count($topics); $i++)
+            {
+              $optStr = $topics[$i];
+              if($optStr != $selectedVal)
+              {
+                $dropDownHtml = $dropDownHtml."<option value=".$optStr.">".$optStr."</option>";
+              }
+            }
+            return $dropDownHtml;
+        }
+        
+        function getUpdateButtonSubmitName()
+        {
+          global $updateButtonSubmitName;
+          return $updateButtonSubmitName;
         }
 
     ?>
@@ -127,14 +165,13 @@
    <br><br>
     <center>
 
-    <form action="graph.php" method="post">
-      <select name="dropdown">
-        <option value="xxx/xxx/xxx">xxx/xxx/xxx</option>
-      </select>
-      <input type="submit" name="show_dropdown_value" value="Update"/>
-    </form>
-
     <form action="graph.php" method="get">
+      <select name="Topic">
+        <?php echo getTopicDropdownHtml();?>
+      </select>
+      <input name=<?php echo getUpdateButtonSubmitName();?> type="submit" value="Update" />
+      <br>
+      <br>
       <input name="submit_1hr" type="submit" value="1 Hr" />
       <input name="submit_4hr" type="submit" value="4 Hr" />
       <input name="submit_12hr" type="submit" value="12 Hr" />
