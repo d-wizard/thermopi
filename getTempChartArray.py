@@ -144,14 +144,14 @@ def getPrintStr(lines):
    retStr = ''
    for line in lines:
       try:
-         [unixTime, temperature, switchState] = line.split(",")
+         [unixTime, temperature] = line.split(",")
 
          # Don't have the .0 if the temperature value is a whole number (i.e. save 2 bytes)
          tempFlt = float(temperature)
          tempInt = int(tempFlt)
          tempStr = str(tempInt) if tempInt == tempFlt else str(tempFlt)
 
-         appendStr = '["Date(' + timeToPrintStr(unixTime) + ')",' + str(int(switchState)) + ',' + tempStr + '],'
+         appendStr = '["Date(' + timeToPrintStr(unixTime) + ')",' + "0"+ ',' + tempStr + '],'
          retStr += appendStr
       except:
          pass
@@ -161,14 +161,13 @@ def getPrintStr(lines):
    return retStr
 
 
-def updateTemperatureLogFile(temperature, switchState, timeOfLastTempWrite, logFilePath):
+def updateTemperatureLogFile(temperature, timeOfLastTempWrite, logFilePath):
    nowUnixTime = getNowTimeUnix()
 
    if (nowUnixTime - timeOfLastTempWrite) >= TIME_BETWEEN_LOG_UPDATES:
       timeOfLastTempWrite = nowUnixTime
 
-      switchStatePrint = "1" if (switchState != None and switchState == True) else "0"
-      logPrint = str(int(nowUnixTime)) + ",{:.1f}".format(temperature) + "," + switchStatePrint + LOG_NEW_LINE
+      logPrint = str(int(nowUnixTime)) + ",{:.1f}".format(temperature) + LOG_NEW_LINE
 
       lockFd = lockFile(logFilePath)
       appendFile(logFilePath, logPrint)

@@ -240,7 +240,7 @@ def logMqttData(mqttData, ctrlSettings):
       # Log the temperature data
       if success:
          global lastMqttLogTime
-         lastMqttLogTime = updateTemperatureLogFile(logFileVal, 0, lastMqttLogTime, ctrlSettings.LogFilePath)
+         lastMqttLogTime = updateTemperatureLogFile(logFileVal, lastMqttLogTime, ctrlSettings.LogFilePath)
    except:
       logMsg("Failed somewhere in logging MQTT Data.")
 
