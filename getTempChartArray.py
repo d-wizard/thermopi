@@ -151,7 +151,7 @@ def getPrintStr(lines):
          tempInt = int(tempFlt)
          tempStr = str(tempInt) if tempInt == tempFlt else str(tempFlt)
 
-         appendStr = '["Date(' + timeToPrintStr(unixTime) + ')",' + "0"+ ',' + tempStr + '],'
+         appendStr = '["Date(' + timeToPrintStr(unixTime) + ')",' + tempStr + '],'
          retStr += appendStr
       except:
          pass
