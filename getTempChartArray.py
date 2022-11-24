@@ -11,8 +11,8 @@ import json
 # Constant Variables
 ################################################################################
 LOG_NEW_LINE = "\n"
-LOG_MAX_TIME = 60*60*24*30 # 1 Month
-LOG_MAX_TIME_TIME_TO_LEAVE_AFTER_TRIM = 60*60*24*14 # 2 Weeks
+LOG_MAX_TIME = 60*60*24*30*2 # 2 Months
+LOG_MAX_TIME_TIME_TO_LEAVE_AFTER_TRIM = 60*60*24*7*6 # 6 Weeks
 TIME_BETWEEN_LOG_UPDATES = 30 # 30 seconds should be enough resolution
 
 THIS_SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))

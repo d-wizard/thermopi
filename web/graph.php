@@ -68,7 +68,14 @@
           $titleStr = "Temperature - 7 Days";
           $updateButtonSubmitName = "submit_7day";
         }
-        
+        if(isset($_GET["submit_30day"]))
+        {
+          $time = 3600*24*30;
+          $numPoints = 3000;
+          $titleStr = "Temperature - 30 Days";
+          $updateButtonSubmitName = "submit_30day";
+        }
+
         if(isset($_GET["Topic"]))
         {
           $topic = $_GET['Topic'];
@@ -168,6 +175,7 @@
       <input name="submit_1day" type="submit" value="1 Day" />
       <input name="submit_3day" type="submit" value="3 Day" />
       <input name="submit_7day" type="submit" value="7 Day" />
+      <input name="submit_30day" type="submit" value="30 Day" />
     </form>
     <div id="curve_chart_with_switch"></div>
     </center>
