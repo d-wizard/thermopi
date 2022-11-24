@@ -92,13 +92,6 @@
             }
             return $dropDownHtml;
         }
-        
-        function getUpdateButtonSubmitName()
-        {
-          global $updateButtonSubmitName;
-          return $updateButtonSubmitName;
-        }
-
     ?>
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script type="text/javascript">
@@ -166,7 +159,7 @@
       <select name="Topic">
         <?php echo getTopicDropdownHtml();?>
       </select>
-      <input name=<?php echo getUpdateButtonSubmitName();?> type="submit" value="Update" />
+      <input name=<?php echo $updateButtonSubmitName;?> type="submit" value="Update" />
       <br>
       <br>
       <input name="submit_1hr" type="submit" value="1 Hr" />
