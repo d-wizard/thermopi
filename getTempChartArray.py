@@ -91,6 +91,34 @@ def lineToTime(line):
       timePart = timePart.replace('\x00', '') # I've seen weird situations where a bunch of 0 bytes get mixed in.
       return int(float(timePart)) # Some google results suggest converting to float before int, IDK. This except shouldn't be getting hit very often...
 
+def getUnixTimeToHumanReadable(unixTime):
+   if unixTime != None:
+      origTimeStr = None
+      try:
+         # returns YYYY-MM-DD HH:MM:SS
+         origTimeStr = str(datetime.fromtimestamp(float((recentTime))))
+      except:
+         return None
+      
+      try:
+         dayInfo, hourInfo = origTimeStr.split(" ") #YYYY-MM-DD HH:MM:SS
+         dayInfo = dayInfo.split("-")
+         hourInfo = hourInfo.split(":")
+         
+         hourInt = int(hourInfo[0])
+         AmPmStr = " PM" if hourInt >= 12 else " AM"
+         if hourInt == 0:
+            hourInt = 12
+         elif hourInt > 12:
+            hourInt -= 12
+         
+         # Return in the stupid MM/DD/YY HH:MM:SS XM format Americans use.
+         return dayInfo[1] + "/" + dayInfo[2] + "/" + dayInfo[0][-2:] + " " + str(hourInt) + ":" + hourInfo[1] + ":" + hourInfo[2] + AmPmStr
+      except:
+         return origTimeStr # something strange happened, but the original time string is valid so just return that
+   else:
+      return None
+   return None
 
 def findTimeIndex(lines, timeLimit):
    numLines = len(lines)
@@ -211,6 +239,7 @@ if __name__== "__main__":
    parser.add_argument("-c", type=int, action="store", dest="chartTime", help="Chart Time", default=3600)
    parser.add_argument("-n", type=int, action="store", dest="numPoints", help="Num Points", default=100)
    parser.add_argument("-t", type=str, action="store", dest="topicName", help="MQTT Topic", default=None)
+   parser.add_argument("-r", action="store_true", dest="recentValue", help="Only return the most recent value.", default=False)
    args = parser.parse_args()
 
    if args.topicName == None:
@@ -231,12 +260,17 @@ if __name__== "__main__":
    if lines[-1] == "":
       lines = lines[:-1]
 
-   timeThresh = getNowTimeUnix() - args.chartTime
-   index = findTimeIndex(lines, timeThresh)
+   if args.recentValue:
+      recentTime = lineToTime(lines[-1])
+      recentTemp = lines[-1].split(",")[1]
+      print(getUnixTimeToHumanReadable(recentTime) + "|" + recentTemp)
+   else:
+      timeThresh = getNowTimeUnix() - args.chartTime
+      index = findTimeIndex(lines, timeThresh)
 
-   if index >= 0:
-      lines = lines[index:]
+      if index >= 0:
+         lines = lines[index:]
 
-      lines = getLinesToChart(lines, args.numPoints)
-      
-      print(getPrintStr(lines))
+         lines = getLinesToChart(lines, args.numPoints)
+
+         print(getPrintStr(lines))

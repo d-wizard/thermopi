@@ -81,6 +81,11 @@
           $topic = $_GET['Topic'];
         }
 
+        $recentTempInfo = shell_exec($pythonScript." -t ".$topic." -r");
+        $recentTempInfo_arr = explode ("|", $recentTempInfo);
+        $recentTime = $recentTempInfo_arr[0];
+        $recentTemp = $recentTempInfo_arr[1]." °F";
+
         function getTopicDropdownHtml()
         {
             global $topics;
@@ -158,7 +163,13 @@
     <title><?php echo "Topic: ".$topic;?></title>
   </head>
    <body style='background-color : <?php echo $DeviceColor;?>' >
-   <br>
+   <div class="devicebar">
+      <table style="width:100%"><tr>
+         <td><?php echo $recentTime;?></td>
+         <td><?php echo $recentTemp;?></td>
+      </tr></table>
+   </div>
+   <br><br><br>
     <center>
 
     <h3><?php echo "Topic: ".$topic." - ".$titleStr;?></h3>
