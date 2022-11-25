@@ -20,7 +20,7 @@
         $topic = $topics[0]; // Default to first in array.
 
         $pythonScript = "python3 ".$thermoPythonDir."getTempChartArray.py";
-        $titleStr = "Temperature - 1 Day";
+        $titleStr = "1 Day";
 
         $time = 3600*24;
         $numPoints = 600;
@@ -30,49 +30,49 @@
         {
           $time = 3600;
           $numPoints = 100;
-          $titleStr = "Temperature - 1 Hr";
+          $titleStr = "1 Hr";
           $updateButtonSubmitName = "submit_1hr";
         }
         if(isset($_GET["submit_4hr"]))
         {
           $time = 3600*4;
           $numPoints = 400;
-          $titleStr = "Temperature - 4 Hrs";
+          $titleStr = "4 Hrs";
           $updateButtonSubmitName = "submit_4hr";
         }
         if(isset($_GET["submit_12hr"]))
         {
           $time = 3600*12;
           $numPoints = 500;
-          $titleStr = "Temperature - 12 Hrs";
+          $titleStr = "12 Hrs";
           $updateButtonSubmitName = "submit_12hr";
         }
         if(isset($_GET["submit_1day"]))
         {
           $time = 3600*24;
           $numPoints = 600;
-          $titleStr = "Temperature - 1 Day";
+          $titleStr = "1 Day";
           $updateButtonSubmitName = "submit_1day";
         }
         if(isset($_GET["submit_3day"]))
         {
           $time = 3600*24*3;
           $numPoints = 800;
-          $titleStr = "Temperature - 3 Days";
+          $titleStr = "3 Days";
           $updateButtonSubmitName = "submit_3day";
         }
         if(isset($_GET["submit_7day"]))
         {
           $time = 3600*24*7;
           $numPoints = 2000;
-          $titleStr = "Temperature - 7 Days";
+          $titleStr = "7 Days";
           $updateButtonSubmitName = "submit_7day";
         }
         if(isset($_GET["submit_30day"]))
         {
           $time = 3600*24*30;
           $numPoints = 3000;
-          $titleStr = "Temperature - 30 Days";
+          $titleStr = "30 Days";
           $updateButtonSubmitName = "submit_30day";
         }
 
@@ -171,7 +171,6 @@
       <br>
       <input name="submit_1hr" type="submit" value="1 Hr" />
       <input name="submit_4hr" type="submit" value="4 Hr" />
-      <input name="submit_12hr" type="submit" value="12 Hr" />
       <input name="submit_1day" type="submit" value="1 Day" />
       <input name="submit_3day" type="submit" value="3 Day" />
       <input name="submit_7day" type="submit" value="7 Day" />
