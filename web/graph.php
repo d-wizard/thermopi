@@ -85,6 +85,8 @@
         $recentTempInfo_arr = explode ("|", $recentTempInfo);
         $recentTime = $recentTempInfo_arr[0];
         $recentTemp = $recentTempInfo_arr[1]." °F";
+        $recentGood = (int)$recentTempInfo_arr[2]; // Cast to integer
+        $recentColor = ($recentGood) ? "#FFFFFF" : "#FFAAAA"; // White for good, light red from bad.
 
         function getTopicDropdownHtml()
         {
@@ -165,7 +167,7 @@
    <body style='background-color : <?php echo $DeviceColor;?>' >
    <div class="devicebar">
       <table style="width:100%"><tr>
-         <td><?php echo $recentTime;?></td>
+         <td><font color = <?php echo $recentColor;?>><?php echo $recentTime;?></font></td>
          <td><?php echo $recentTemp;?></td>
       </tr></table>
    </div>

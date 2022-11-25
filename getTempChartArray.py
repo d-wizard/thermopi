@@ -261,9 +261,15 @@ if __name__== "__main__":
       lines = lines[:-1]
 
    if args.recentValue:
-      recentTime = lineToTime(lines[-1])
-      recentTemp = lines[-1].split(",")[1]
-      print(getUnixTimeToHumanReadable(recentTime) + "|" + recentTemp)
+      nowUnixTime = getNowTimeUnix()
+      recentLogLine = lines[-1]
+      recentTime = lineToTime(recentLogLine)
+      recentTemp = recentLogLine.split(",")[1]
+
+      deltaTime = nowUnixTime - recentTime
+      veryOldTimeThreshold = 8*60 # 8 minutes
+      goodTimeStr = "1" if deltaTime < veryOldTimeThreshold else "0" # indicate whether this the last value is recent or it is very old
+      print(getUnixTimeToHumanReadable(recentTime) + "|" + recentTemp + "|" + goodTimeStr)
    else:
       timeThresh = getNowTimeUnix() - args.chartTime
       index = findTimeIndex(lines, timeThresh)
