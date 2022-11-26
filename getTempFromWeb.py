@@ -30,7 +30,7 @@ if __name__== "__main__":
    parser.add_argument("-t", type=str, action="store", dest="topic", help="Topic", default=None)
    parser.add_argument("-u", type=str, action="store", dest="username", help="Auth User Name", default=None)
    parser.add_argument("-w", type=str, action="store", dest="password", help="Auth Password", default=None)
-   parser.add_argument("-o", type=int, action="store", dest="pollPeriod", help="How often to poll the sensor in seconds", default=30)
+   parser.add_argument("-o", type=int, action="store", dest="pollPeriod", help="How often to poll the sensor in seconds", default=300)
    args = parser.parse_args()
 
    if args.topic == None:
@@ -44,4 +44,4 @@ if __name__== "__main__":
             publish.single(args.topic, str(tempF), hostname=args.broker, port=args.port)
       except:
          pass
-      time.sleep(args.pollPeriod if args.pollPeriod > 0 else 30)
+      time.sleep(args.pollPeriod if args.pollPeriod > 0 else 300)
