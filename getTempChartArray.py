@@ -18,6 +18,8 @@ TIME_BETWEEN_LOG_UPDATES = 30 # 30 seconds should be enough resolution
 THIS_SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
 TOPIC_PATH_JSON_NAME = "TopicLogPath.json"
 
+NOW_TIME_TO_USE = None # Default to querying now time
+
 def readWholeFile(path):
    retVal = ""
    try:
@@ -76,6 +78,11 @@ def timeToPrintStr(unixTime):
    return ",".join(retStrs)
 
 def getNowTimeUnix():
+   # Check for early return case
+   global NOW_TIME_TO_USE
+   if NOW_TIME_TO_USE != None:
+      return NOW_TIME_TO_USE
+
    nowUnixTime = time.mktime(datetime.now().timetuple())
    return int(nowUnixTime)
 
@@ -240,18 +247,31 @@ if __name__== "__main__":
    parser.add_argument("-n", type=int, action="store", dest="numPoints", help="Num Points", default=100)
    parser.add_argument("-t", type=str, action="store", dest="topicName", help="MQTT Topic", default=None)
    parser.add_argument("-r", action="store_true", dest="recentValue", help="Only return the most recent value.", default=False)
+   parser.add_argument("-l", type=str, action="store", dest="logFilePath", help="Log File Path", default=None)
+   parser.add_argument("-o", type=int, action="store", dest="overrideTime", help="Use this to override now time.", default=None)
    args = parser.parse_args()
 
-   if args.topicName == None:
+   logFilePathSpecified = args.logFilePath != None and os.path.isfile(args.logFilePath)
+
+   # Make sure enough info was specified to determine where the log file is.
+   if args.topicName == None and logFilePathSpecified == False:
       exit()
 
-   topicLogPath = getTopicLogFilePath(args.topicName)
-   if topicLogPath == None:
+   # Determine where the log file is.
+   logPath = args.logFilePath if logFilePathSpecified else getTopicLogFilePath(args.topicName)
+   if logPath == None or not os.path.isfile(logPath):
       exit()
+
+   # See if the user want to specify "Now Time"
+   if args.overrideTime != None:
+      try:
+         NOW_TIME_TO_USE = int(args.overrideTime)
+      except:
+         exit()
 
    # Process the Log File
-   lockFd = lockFile(topicLogPath)
-   temperatureLogFile = readWholeFile(topicLogPath)
+   lockFd = lockFile(logPath)
+   temperatureLogFile = readWholeFile(logPath)
    unlockFile(lockFd)
 
    lines = temperatureLogFile.split(LOG_NEW_LINE)
