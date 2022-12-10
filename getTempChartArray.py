@@ -227,14 +227,21 @@ def updateTemperatureLogFile(temperature, timeOfLastTempWrite, logFilePath):
    return timeOfLastTempWrite
 
 def getTopicLogFilePath(topicName):
-   try:
-      jsonFromFileSystem = json.loads(readWholeFile(os.path.join(THIS_SCRIPT_DIR, TOPIC_PATH_JSON_NAME)))
+   topicFileName = topicName + ".log"
+   topicLogFilePath = os.path.join(THIS_SCRIPT_DIR, topicFileName) # Check if this script is in the MQTT Log file location.
 
-      topicLogFilePath = os.path.join(jsonFromFileSystem["TopicLogBaseDir"], topicName + ".log")
-      if os.path.isfile(topicLogFilePath):
-         return topicLogFilePath
-   except:
-      pass
+   if os.path.isfile(topicLogFilePath):
+      return topicLogFilePath
+   else:
+      try:
+         # Check if the path to the topic logs is specified via JSON
+         jsonFromFileSystem = json.loads(readWholeFile(os.path.join(THIS_SCRIPT_DIR, TOPIC_PATH_JSON_NAME)))
+   
+         topicLogFilePath = os.path.join(jsonFromFileSystem["TopicLogBaseDir"], topicFileName)
+         if os.path.isfile(topicLogFilePath):
+            return topicLogFilePath
+      except:
+         pass
 
    return None
 
