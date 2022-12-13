@@ -196,13 +196,17 @@ def getPrintStr(lines):
    return retStr
 
 
-def updateTemperatureLogFile(temperature, timeOfLastTempWrite, logFilePath):
+def updateTemperatureLogFile(temperatureList, timeOfLastTempWrite, logFilePath):
    nowUnixTime = getNowTimeUnix()
 
    if (nowUnixTime - timeOfLastTempWrite) >= TIME_BETWEEN_LOG_UPDATES:
       timeOfLastTempWrite = nowUnixTime
 
-      logPrint = str(int(nowUnixTime)) + ",{:.1f}".format(temperature) + LOG_NEW_LINE
+      # Generate the log line
+      logPrint = str(int(nowUnixTime))
+      for temperature in temperatureList:
+         logPrint += ",{:.1f}".format(temperature)
+      logPrint += LOG_NEW_LINE
 
       lockFd = lockFile(logFilePath)
       appendFile(logFilePath, logPrint)

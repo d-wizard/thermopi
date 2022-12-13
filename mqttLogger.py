@@ -204,45 +204,61 @@ def loadSettingsFromJson(pathToJson):
 # MQTT Logger Helper Functions
 ################################################################################
 def logMqttData(mqttData, ctrlSettings):
-   mqttData = strToFloat(mqttData)
-   if mqttData == None:
-      return
+   delim = ','
+   mqttDataStrs = mqttData.split(delim) if delim in mqttData else [mqttData]
+   logFileVals = []
+   success = True
+   for mqttDataIndex in range(len(mqttDataStrs)):
+      val = getLogFileValue(mqttDataStrs[mqttDataIndex], mqttDataIndex, ctrlSettings)
+      logFileVals.append(val)
+      if val == None:
+         success = False
+   
+   # Log the data
+   if success:
+      global lastMqttLogTime
+      lastMqttLogTime = updateTemperatureLogFile(logFileVals, lastMqttLogTime, ctrlSettings.LogFilePath)
+
+def getLogFileValue(mqttDataStr, mqttDataIndex, ctrlSettings):
+   mqttData = strToFloat(mqttDataStr)
+   logFileVal = None
 
    try:
-      logFileVal = None
-      success = True
       if ctrlSettings.NumPointsToAverage != None and ctrlSettings.NumPointsToAverage > 0:
          try:
             global mqttStoreValuesForAverage
-            mqttStoreValuesForAverage.append(mqttData)
+            while len(mqttStoreValuesForAverage) <= mqttDataIndex:
+               mqttStoreValuesForAverage.append([]) # Put an empty list at the end.
 
-            # Remove old values from the list.
-            if len(mqttStoreValuesForAverage) >= ctrlSettings.NumPointsToAverage:
-               mqttStoreValuesForAverage = mqttStoreValuesForAverage[-ctrlSettings.NumPointsToAverage:]
+            # Add the new data if it's valid
+            if mqttData != None:
+               mqttStoreValuesForAverage[mqttDataIndex].append(mqttData)
 
-            # Compute the average temperature from all the values in the list.
-            averageSum = 0
-            for temp in mqttStoreValuesForAverage:
-               averageSum += temp
-            logFileVal = averageSum / len(mqttStoreValuesForAverage)
+               # Remove old values from the list.
+               if len(mqttStoreValuesForAverage[mqttDataIndex]) >= ctrlSettings.NumPointsToAverage:
+                  mqttStoreValuesForAverage[mqttDataIndex] = mqttStoreValuesForAverage[mqttDataIndex][-ctrlSettings.NumPointsToAverage:]
+
+            # Compute the average value from all the values in the list.
+            if len(mqttStoreValuesForAverage[mqttDataIndex]) > 0:
+               averageSum = 0
+               for temp in mqttStoreValuesForAverage[mqttDataIndex]:
+                  averageSum += temp
+               logFileVal = averageSum / len(mqttStoreValuesForAverage[mqttDataIndex])
          except:
-            success = False
-
+            pass
       else:
          logFileVal = mqttData
 
-      # Make sure its a number
-      try:
-         logFileVal = float(logFileVal)
-      except:
-         success = False
-      
-      # Log the temperature data
-      if success:
-         global lastMqttLogTime
-         lastMqttLogTime = updateTemperatureLogFile(logFileVal, lastMqttLogTime, ctrlSettings.LogFilePath)
    except:
       logMsg("Failed somewhere in logging MQTT Data.")
+
+   # Make sure its a number
+   try:
+      logFileVal = float(logFileVal)
+   except:
+      logFileVal = None
+   return logFileVal
+      
 
 ################################################################################
 # MQTT Functions
