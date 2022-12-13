@@ -175,18 +175,37 @@ def getLinesToChart(lines, numLinesToChart):
 
    return retVal
 
-def getPrintStr(lines):
+def getPrintStr(lines, indexes = None):
+   # If indexes is a single number, make it a list with just that number in it.
+   if indexes != None and type(indexes) != list:
+      indexes = [indexes] # convert signal value to a list
+
    retStr = ''
    for line in lines:
       try:
-         [unixTime, temperature] = line.split(",")
+         lineSplit = line.split(",")
 
-         # Don't have the .0 if the temperature value is a whole number (i.e. save 2 bytes)
-         tempFlt = float(temperature)
-         tempInt = int(tempFlt)
-         tempStr = str(tempInt) if tempInt == tempFlt else str(tempFlt)
+         # Start the chart string.
+         appendStr = '["Date(' + timeToPrintStr(lineSplit[0]) + ')"' # Start with the unix time
 
-         appendStr = '["Date(' + timeToPrintStr(unixTime) + ')",' + tempStr + '],'
+         for valueIndex in range(len(lineSplit)-1):
+            # Determine if value should be added to the chart.
+            validIndex = (indexes == None) # if indexes insn't specified, all indexes are valid.
+            if indexes != None:
+               validIndex = valueIndex in indexes # Make sure this value's index is specified in indexes
+            
+            if validIndex:
+               # Don't have the .0 if the temperature value is a whole number (i.e. save 2 bytes)
+               tempFlt = float(lineSplit[valueIndex+1])
+               tempInt = int(tempFlt)
+               tempStr = str(tempInt) if tempInt == tempFlt else str(tempFlt)
+
+               # Add to the chart string
+               appendStr += ',' + tempStr
+         
+         # Finish the chart string
+         appendStr += '],'
+
          retStr += appendStr
       except:
          pass
@@ -260,6 +279,7 @@ if __name__== "__main__":
    parser.add_argument("-r", action="store_true", dest="recentValue", help="Only return the most recent value.", default=False)
    parser.add_argument("-l", type=str, action="store", dest="logFilePath", help="Log File Path", default=None)
    parser.add_argument("-o", type=int, action="store", dest="overrideTime", help="Use this to override now time.", default=None)
+   parser.add_argument("-i", type=int, action="store", dest="dataIndexToChart", help="The index of the data to chart (0 to N).", default=None)
    args = parser.parse_args()
 
    logFilePathSpecified = args.logFilePath != None and os.path.isfile(args.logFilePath)
@@ -310,4 +330,4 @@ if __name__== "__main__":
 
          lines = getLinesToChart(lines, args.numPoints)
 
-         print(getPrintStr(lines))
+         print(getPrintStr(lines, args.dataIndexToChart))
