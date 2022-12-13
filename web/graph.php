@@ -88,6 +88,8 @@
         $recentGood = (int)$recentTempInfo_arr[2]; // Cast to integer
         $recentColor = ($recentGood) ? "#FFFFFF" : "#FFAAAA"; // White for good, light red from bad.
 
+        $humidityChart = (strpos($topic, "humidity")!==false);
+
         function getTopicDropdownHtml()
         {
             global $topics;
@@ -105,6 +107,30 @@
               }
             }
             return $dropDownHtml;
+        }
+
+        function getChartNames()
+        {
+          global $humidityChart;
+          if($humidityChart)
+          {
+            return "'Temperature (°F)', 'Humidiy (%)'";
+          }
+          return "'Temperature (°F)'";
+        }
+
+        function getSeriesAxesChartParams()
+        {
+          global $humidityChart;
+          $retVal = "";
+          if(!$humidityChart)
+          {
+            // Gives each series an axis that matches the vAxes number below.
+            $retVal = $retVal."series: { 0: {targetAxisIndex: 0, color: '#3366CC'} },"; // Add the javascript line
+            // Adds titles to each axis.
+            $retVal = $retVal."vAxes: { 0: {title: 'Temperature (°F)', textPosition: 'out'} },"; // Add the javascript line
+          }
+          return $retVal;
         }
     ?>
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
@@ -129,7 +155,7 @@
 
       function drawChart() {
         var data = google.visualization.arrayToDataTable([
-          [{type: 'datetime', label: 'Time'}, 'Temperature (°F)'],
+          [{type: 'datetime', label: 'Time'}, <?php echo getChartNames();?>],
           <?php echo shell_exec($pythonScript." -c ".$time." -n ".$numPoints." -t ".$topic);?>
         ]);
 
@@ -144,14 +170,7 @@
           },
           titleTextStyle: { fontSize: 20},
           legend: { position: 'bottom' },
-          // Gives each series an axis that matches the vAxes number below.
-          series: {
-            0: {targetAxisIndex: 0, color: '#3366CC'}
-          },
-          vAxes: {
-            // Adds titles to each axis.
-            0: {title: 'Temperature (°F)', textPosition: 'out'}
-          },
+          <?php echo getSeriesAxesChartParams();?>
           backgroundColor: '<?php echo $DeviceColor;?>',
           width: chartW,
           height: chartH
