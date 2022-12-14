@@ -19,6 +19,7 @@ class topicLogSettings(object):
       self.TopicName = None
       self.NumPointsToAverage = None
       self.LogFilePath = None
+      self.MinTimeBetweenLogUpdates = 30
       
       self.MqttBrokerIp = None
       self.MqttBrokerPort = None
@@ -156,6 +157,10 @@ def dictToClass(settingsDict, settingsClass):
    settingsClass.NumPointsToAverage = val
    [allValid, allAvailValid, anyValid] = getValidDictToClass(allValid, allAvailValid, anyValid, exists, converted)
 
+   [exists, converted, val] = tryDictSettingToType(int, settingsDict, 'MinTimeBetweenLogUpdates', settingsClass.MinTimeBetweenLogUpdates)
+   settingsClass.MinTimeBetweenLogUpdates = val
+   [allValid, allAvailValid, anyValid] = getValidDictToClass(allValid, allAvailValid, anyValid, exists, converted)
+
    [exists, converted, val] = tryDictSettingToType(str, settingsDict, 'LogFilePath', settingsClass.LogFilePath)
    settingsClass.LogFilePath = val
    [allValid, allAvailValid, anyValid] = getValidDictToClass(allValid, allAvailValid, anyValid, exists, converted)
@@ -217,7 +222,7 @@ def logMqttData(mqttData, ctrlSettings):
    # Log the data
    if success:
       global lastMqttLogTime
-      lastMqttLogTime = updateTemperatureLogFile(logFileVals, lastMqttLogTime, ctrlSettings.LogFilePath)
+      lastMqttLogTime = updateTemperatureLogFile(logFileVals, lastMqttLogTime, ctrlSettings.LogFilePath, ctrlSettings.MinTimeBetweenLogUpdates)
 
 def getLogFileValue(mqttDataStr, mqttDataIndex, ctrlSettings):
    mqttData = strToFloat(mqttDataStr)

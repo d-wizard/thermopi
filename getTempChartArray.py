@@ -13,7 +13,6 @@ import json
 LOG_NEW_LINE = "\n"
 LOG_MAX_TIME = 60*60*24*30*2 # 2 Months
 LOG_MAX_TIME_TIME_TO_LEAVE_AFTER_TRIM = 60*60*24*7*6 # 6 Weeks
-TIME_BETWEEN_LOG_UPDATES = 30 # 30 seconds should be enough resolution
 
 THIS_SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
 TOPIC_PATH_JSON_NAME = "TopicLogPath.json"
@@ -215,10 +214,10 @@ def getPrintStr(lines, indexes = None):
    return retStr
 
 
-def updateTemperatureLogFile(temperatureList, timeOfLastTempWrite, logFilePath):
+def updateTemperatureLogFile(temperatureList, timeOfLastTempWrite, logFilePath, minTimeBetweenLogUpdates = 30):
    nowUnixTime = getNowTimeUnix()
 
-   if (nowUnixTime - timeOfLastTempWrite) >= TIME_BETWEEN_LOG_UPDATES:
+   if (nowUnixTime - timeOfLastTempWrite) >= minTimeBetweenLogUpdates:
       timeOfLastTempWrite = nowUnixTime
 
       # Generate the log line
