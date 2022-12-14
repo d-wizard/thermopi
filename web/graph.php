@@ -81,14 +81,46 @@
           $topic = $_GET['Topic'];
         }
 
+        $humidityChart    = (strpos($topic, "humidity")    !== false);
+        $temperatureChart = (strpos($topic, "temperature") !== false);
+        $brightnessChart  = (strpos($topic, "brightness")  !== false);
+
+        //////////////////////////////////////////////////////////////////////////////
+        // Define Webpage Banner Variables
+        //////////////////////////////////////////////////////////////////////////////
         $recentTempInfo = shell_exec($pythonScript." -t ".$topic." -r");
         $recentTempInfo_arr = explode ("|", $recentTempInfo);
         $recentTime = $recentTempInfo_arr[0];
-        $recentTemp = $recentTempInfo_arr[1]." °F";
-        $recentGood = (int)$recentTempInfo_arr[2]; // Cast to integer
+        $recentGood = (int)$recentTempInfo_arr[1]; // Cast to integer
         $recentColor = ($recentGood) ? "#FFFFFF" : "#FFAAAA"; // White for good, light red from bad.
 
-        $humidityChart = (strpos($topic, "humidity")!==false);
+        // Fill in the recentValueStr that will go on the banner of the webpage.
+        $recentValueStr = $recentTempInfo_arr[2];
+        if($humidityChart || $temperatureChart) // For humidityChart and temperatureChart the first value is °F
+        {
+          $recentValueStr = $recentValueStr." °F";
+        }
+        elseif($brightnessChart) // For brightnessChart, it's just a percent
+        {
+          $recentValueStr = $recentValueStr." %";
+        }
+        if($humidityChart && count($recentTempInfo_arr) > 3) // Humidity sensors have temperature and humidity.
+        {
+          $recentValueStr = $recentValueStr."  |  ".$recentTempInfo_arr[3]." %";
+        }
+
+        //////////////////////////////////////////////////////////////////////////////
+        // Define Chart Legend Variables
+        //////////////////////////////////////////////////////////////////////////////
+        $chartLegend = "'Temperature (°F)'"; // Default
+        if($humidityChart)
+        {
+          $chartLegend = "'Temperature (°F)', 'Humidiy (%)'";
+        }
+        elseif($brightnessChart)
+        {
+          $chartLegend = "'Brightness (%)'";
+        }
 
         function getTopicDropdownHtml()
         {
@@ -109,16 +141,6 @@
             return $dropDownHtml;
         }
 
-        function getChartNames()
-        {
-          global $humidityChart;
-          if($humidityChart)
-          {
-            return "'Temperature (°F)', 'Humidiy (%)'";
-          }
-          return "'Temperature (°F)'";
-        }
-
         function getSeriesAxesChartParams()
         {
           global $humidityChart;
@@ -128,7 +150,7 @@
             // Gives each series an axis that matches the vAxes number below.
             $retVal = $retVal."series: { 0: {targetAxisIndex: 0, color: '#3366CC'} },"; // Add the javascript line
             // Adds titles to each axis.
-            $retVal = $retVal."vAxes: { 0: {title: 'Temperature (°F)', textPosition: 'out'} },"; // Add the javascript line
+            //$retVal = $retVal."vAxes: { 0: {title: 'Temperature (°F)', textPosition: 'out'} },"; // This doesn't really add any useful info.
           }
           return $retVal;
         }
@@ -155,7 +177,7 @@
 
       function drawChart() {
         var data = google.visualization.arrayToDataTable([
-          [{type: 'datetime', label: 'Time'}, <?php echo getChartNames();?>],
+          [{type: 'datetime', label: 'Time'}, <?php echo $chartLegend;?>],
           <?php echo shell_exec($pythonScript." -c ".$time." -n ".$numPoints." -t ".$topic);?>
         ]);
 
@@ -187,7 +209,7 @@
    <div class="devicebar">
       <table style="width:100%"><tr>
          <td><font color = <?php echo $recentColor;?>><?php echo $recentTime;?></font></td>
-         <td><?php echo $recentTemp;?></td>
+         <td><?php echo $recentValueStr;?></td>
       </tr></table>
    </div>
    <br><br><br>

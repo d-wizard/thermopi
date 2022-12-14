@@ -314,12 +314,12 @@ if __name__== "__main__":
       nowUnixTime = getNowTimeUnix()
       recentLogLine = lines[-1]
       recentTime = lineToTime(recentLogLine)
-      recentTemp = recentLogLine.split(",")[1]
+      recentValues = recentLogLine.split(",")[1:] # Strip off the time stamp.
 
       deltaTime = nowUnixTime - recentTime
       veryOldTimeThreshold = 8*60 # 8 minutes
       goodTimeStr = "1" if deltaTime < veryOldTimeThreshold else "0" # indicate whether this the last value is recent or it is very old
-      print(getUnixTimeToHumanReadable(recentTime) + "|" + recentTemp + "|" + goodTimeStr)
+      print(getUnixTimeToHumanReadable(recentTime) + "|" + goodTimeStr + "|" + "|".join(recentValues)) # return Time String|valid_time|sensor_data
    else:
       timeThresh = getNowTimeUnix() - args.chartTime
       index = findTimeIndex(lines, timeThresh)
