@@ -17,7 +17,7 @@ from getTempChartArray import getTopicLogFilePath
 class topicLogSettings(object):
    def __init__(self):
       self.TopicName = None
-      self.NumPointsToAverage = None
+      self.NumPointsToAverage = 1
       self.LogFilePath = None
       self.MinTimeBetweenLogUpdates = 30
       
@@ -194,12 +194,16 @@ def loadSettingsFromJson(pathToJson):
    success = True
    try:
       jsonFromFileSystem = json.loads(readWholeFile(pathToJson))
-      success = dictToClass(jsonFromFileSystem, currentSettings)[0] # [0] is allValid
+      success = dictToClass(jsonFromFileSystem, currentSettings)[1] # [1] is allAvailValid
 
-      if not success and currentSettings.LogFilePath == None and currentSettings.TopicName != None:
-         # If LogFilePath wasn't specified, determine its value from the topic name and try again
-         jsonFromFileSystem["LogFilePath"] = getTopicLogFilePath(currentSettings.TopicName)
-         success = dictToClass(jsonFromFileSystem, currentSettings)[0] # [0] is allValid
+      if currentSettings.LogFilePath == None and currentSettings.TopicName != None:
+         # If LogFilePath wasn't specified, determine its value from the topic name
+         currentSettings.LogFilePath = getTopicLogFilePath(currentSettings.TopicName)
+
+      # Make sure certain values have been filled in.
+      if currentSettings.TopicName == None or currentSettings.LogFilePath == None or \
+         currentSettings.MqttBrokerIp == None or currentSettings.MqttBrokerPort == None:
+         success = False
 
    except:
       success = False
