@@ -97,9 +97,10 @@ if __name__== "__main__":
    # Check if the script is already running.
    running = False
    procInfo = getProcInfo(PYTHON)
+   thisPid = os.getpid()
    for p in procInfo:
       try:
-         if SCRIPT_PATH in p.cmds:
+         if SCRIPT_PATH in p.cmds and p.pid != thisPid: # Make sure not to include this process.
             # Check if args match
             if args.args != None:
                thisCmdArgs = " ".join(p.cmds[1:]) # Combine everything after the python script path into a single string.
