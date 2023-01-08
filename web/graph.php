@@ -112,10 +112,12 @@
         //////////////////////////////////////////////////////////////////////////////
         // Define Chart Legend Variables
         //////////////////////////////////////////////////////////////////////////////
+        $expectedNumCurves = 1;
         $chartLegend = "'Temperature (°F)'"; // Default
         if($humidityChart)
         {
           $chartLegend = "'Temperature (°F)', 'Humidiy (%)'";
+          $expectedNumCurves = 2;
         }
         elseif($brightnessChart)
         {
@@ -178,7 +180,7 @@
       function drawChart() {
         var data = google.visualization.arrayToDataTable([
           [{type: 'datetime', label: 'Time'}, <?php echo $chartLegend;?>],
-          <?php echo shell_exec($pythonScript." -c ".$time." -n ".$numPoints." -t ".$topic);?>
+          <?php echo shell_exec($pythonScript." -c ".$time." -n ".$numPoints." -t ".$topic." -e ".strval($expectedNumCurves));?>
         ]);
 
         var options = {

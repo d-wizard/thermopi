@@ -174,7 +174,7 @@ def getLinesToChart(lines, numLinesToChart):
 
    return retVal
 
-def getPrintStr(lines, indexes = None):
+def getPrintStr(lines, indexes = None, expectedNumCurves = 0):
    # If indexes is a single number, make it a list with just that number in it.
    if indexes != None and type(indexes) != list:
       indexes = [indexes] # convert signal value to a list
@@ -187,21 +187,23 @@ def getPrintStr(lines, indexes = None):
          # Start the chart string.
          appendStr = '["Date(' + timeToPrintStr(lineSplit[0]) + ')"' # Start with the unix time
 
-         for valueIndex in range(len(lineSplit)-1):
-            # Determine if value should be added to the chart.
-            validIndex = (indexes == None) # if indexes insn't specified, all indexes are valid.
-            if indexes != None:
-               validIndex = valueIndex in indexes # Make sure this value's index is specified in indexes
-            
-            if validIndex:
-               # Don't have the .0 if the temperature value is a whole number (i.e. save 2 bytes)
-               tempFlt = float(lineSplit[valueIndex+1])
-               tempInt = int(tempFlt)
-               tempStr = str(tempInt) if tempInt == tempFlt else str(tempFlt)
+         numCurves = len(lineSplit) - 1 # first value is time (i.e. Y-Axis), so subtract 1 to get number of curves in the chart
+         if expectedNumCurves == 0 or expectedNumCurves == numCurves: # expectedNumCurves of 0 means don't limit...
+            for valueIndex in range(numCurves):
+               # Determine if value should be added to the chart.
+               validIndex = (indexes == None) # if indexes insn't specified, all indexes are valid.
+               if indexes != None:
+                  validIndex = valueIndex in indexes # Make sure this value's index is specified in indexes
+               
+               if validIndex:
+                  # Don't have the .0 if the temperature value is a whole number (i.e. save 2 bytes)
+                  tempFlt = float(lineSplit[valueIndex+1])
+                  tempInt = int(tempFlt)
+                  tempStr = str(tempInt) if tempInt == tempFlt else str(tempFlt)
 
-               # Add to the chart string
-               appendStr += ',' + tempStr
-         
+                  # Add to the chart string
+                  appendStr += ',' + tempStr
+
          # Finish the chart string
          appendStr += '],'
 
@@ -279,6 +281,7 @@ if __name__== "__main__":
    parser.add_argument("-l", type=str, action="store", dest="logFilePath", help="Log File Path", default=None)
    parser.add_argument("-o", type=int, action="store", dest="overrideTime", help="Use this to override now time.", default=None)
    parser.add_argument("-i", type=int, action="store", dest="dataIndexToChart", help="The index of the data to chart (0 to N).", default=None)
+   parser.add_argument("-e", type=int, action="store", dest="expectedNumCurves", help="The expected number of curves.", default=0)
    args = parser.parse_args()
 
    logFilePathSpecified = args.logFilePath != None and os.path.isfile(args.logFilePath)
@@ -329,4 +332,4 @@ if __name__== "__main__":
 
          lines = getLinesToChart(lines, args.numPoints)
 
-         print(getPrintStr(lines, args.dataIndexToChart))
+         print(getPrintStr(lines, args.dataIndexToChart, args.expectedNumCurves))
