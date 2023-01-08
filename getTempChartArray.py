@@ -184,11 +184,11 @@ def getPrintStr(lines, indexes = None, expectedNumCurves = 0):
       try:
          lineSplit = line.split(",")
 
-         # Start the chart string.
-         appendStr = '["Date(' + timeToPrintStr(lineSplit[0]) + ')"' # Start with the unix time
-
          numCurves = len(lineSplit) - 1 # first value is time (i.e. Y-Axis), so subtract 1 to get number of curves in the chart
          if expectedNumCurves == 0 or expectedNumCurves == numCurves: # expectedNumCurves of 0 means don't limit...
+            # Start the chart string.
+            appendStr = '["Date(' + timeToPrintStr(lineSplit[0]) + ')"' # Start with the unix time
+
             for valueIndex in range(numCurves):
                # Determine if value should be added to the chart.
                validIndex = (indexes == None) # if indexes insn't specified, all indexes are valid.
@@ -204,10 +204,10 @@ def getPrintStr(lines, indexes = None, expectedNumCurves = 0):
                   # Add to the chart string
                   appendStr += ',' + tempStr
 
-         # Finish the chart string
-         appendStr += '],'
+            # Finish the chart string
+            appendStr += '],'
 
-         retStr += appendStr
+            retStr += appendStr
       except:
          pass
    
