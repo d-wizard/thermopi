@@ -10,15 +10,22 @@ chmod 755 getTempChartArray.py
 chmod 644 TopicLogPath.json
 
 # Make directory for log file
-# Make sure lock file / log file exist.
+mkdir -p /mnt/4GBUSB/logs/mqtt/basement/storage
+mkdir -p /mnt/4GBUSB/logs/mqtt/office
+mkdir -p /mnt/4GBUSB/logs/mqtt/garage
 
 # Make sure the log file and log file exist.
-# touch /path/to/log/file.lock
-# touch /path/to/log/file.log
+touch /mnt/4GBUSB/logs/mqtt/basement/storage/temperature.lock
+touch /mnt/4GBUSB/logs/mqtt/basement/storage/temperature.log
+touch /mnt/4GBUSB/logs/mqtt/office/temperature.lock
+touch /mnt/4GBUSB/logs/mqtt/office/temperature.log
+touch /mnt/4GBUSB/logs/mqtt/garage/temperature.lock
+touch /mnt/4GBUSB/logs/mqtt/garage/temperature.log
+
 
 # Make sure log files are accessable
-chmod 777 $(find /path/to/base/log/directory -type d)
-chmod 666 $(find /path/to/base/log/directory -type f)
+chmod 777 $(find /mnt/4GBUSB/logs/mqtt -type d)
+chmod 666 $(find /mnt/4GBUSB/logs/mqtt -type f)
 
 # Make sure subscriptions are accessable
 chmod 755 subscriptions
