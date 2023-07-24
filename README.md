@@ -10,6 +10,10 @@ Initialize the Repo:
 * cd /path/to/thermopi
 * ./firstSetup.sh
 ---
+Allow Temperature Sensor to be Read
+* Open '/boot/config.txt' for editing (e.g. vi, nano, etc)
+* Add 'dtoverlay=w1-gpio' and save
+---
 Create symbolic link of the web folder to the webserver:
 * sudo ln -nfs /path/to/thermopi/web /path/to/webserver/thermopi
 ---
