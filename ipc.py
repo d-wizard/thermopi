@@ -12,7 +12,7 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-import SocketServer
+import socketserver
 import socket
 import struct
 import json
@@ -45,7 +45,7 @@ def _read_objects(sock):
 def _write_objects(sock, objects):
     data = json.dumps([o.serialize() for o in objects])
     sock.sendall(struct.pack('!i', len(data) + 4))
-    sock.sendall(data)
+    sock.sendall(data.encode())
 
 def _recursive_subclasses(cls):
     classmap = {}
@@ -90,7 +90,7 @@ class Message(object):
 class Client(object):
     def __init__(self, server_address):
         self.addr = server_address
-        if isinstance(self.addr, basestring):
+        if isinstance(self.addr, str):
             address_family = socket.AF_UNIX
         else:
             address_family = socket.AF_INET
@@ -114,12 +114,12 @@ class Client(object):
         return _read_objects(self.sock)
 
 
-class Server(SocketServer.ThreadingUnixStreamServer):
+class Server(socketserver.ThreadingUnixStreamServer):
     def __init__(self, server_address, callback, bind_and_activate=True):
         if not callable(callback):
             callback = lambda x: []
 
-        class IPCHandler(SocketServer.BaseRequestHandler):
+        class IPCHandler(socketserver.BaseRequestHandler):
             def handle(self):
                 while True:
                     try:
@@ -128,9 +128,9 @@ class Server(SocketServer.ThreadingUnixStreamServer):
                         return
                     _write_objects(self.request, callback(results))
 
-        if isinstance(server_address, basestring):
+        if isinstance(server_address, str):
             self.address_family = socket.AF_UNIX
         else:
             self.address_family = socket.AF_INET
 
-        SocketServer.TCPServer.__init__(self, server_address, IPCHandler, bind_and_activate)
+        socketserver.TCPServer.__init__(self, server_address, IPCHandler, bind_and_activate)

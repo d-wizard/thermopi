@@ -183,7 +183,7 @@ def logMsg(printMsg, unimportantMsg = False):
          writeWholeFile(WEB_LOG_PATH, logMsg + logNewLine + readWholeFile(WEB_LOG_PATH))
          limitLogSize(WEB_LOG_PATH, False, logMaxLogLines_short, logLineToLeaveAfterTrim_short)
    except:
-      print "Failed to log to web. - " + WEB_LOG_PATH
+      print("Failed to log to web. - " + WEB_LOG_PATH)
       
       
 

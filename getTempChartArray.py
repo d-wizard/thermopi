@@ -222,4 +222,4 @@ if __name__== "__main__":
 
       lines = getLinesToChart(lines, args.numPoints)
       
-      print getPrintStr(lines)
+      print(getPrintStr(lines))
