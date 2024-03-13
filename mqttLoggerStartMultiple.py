@@ -8,6 +8,8 @@ MQTT_LOG_FILE_CHMOD = '666'
 
 THIS_SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
 
+CHART_ARRAY_PY = "getTempChartArray.py"
+
 with open(os.path.join(THIS_SCRIPT_DIR, "mqttLoggerSubs.json")) as subsJsonFile:
    subsJson = json.load(subsJsonFile)
 
@@ -31,12 +33,19 @@ with open(os.path.join(THIS_SCRIPT_DIR, "mqttLoggerSubs.json")) as subsJsonFile:
                os.system(f"chmod {MQTT_LOG_DIR_CHMOD} {logFileDir}") # Set directory permissions
 
             # Create the log files.
-            def makeLogFile(logFileName):
+            def makeLogFile(logFileDir, logFileName):
+               logFileName = os.path.join(logFileDir, logFileName)
                if not os.path.exists(logFileName):
                   os.system(f"touch {logFileName}")
                   os.system(f"chmod {MQTT_LOG_FILE_CHMOD} {logFileName}") # Set log file permissions
-            makeLogFile(os.path.join(logFileDir, logFileNameBase + ".lock"))
-            makeLogFile(os.path.join(logFileDir, logFileNameBase + ".log"))
+            makeLogFile(logFileDir, logFileNameBase + ".lock")
+            makeLogFile(logFileDir, logFileNameBase + ".log")
+
+            # Copy the Chart Array Script
+            chartArrayFinalPath = os.path.join(MQTT_LOG_BASE_DIR, CHART_ARRAY_PY)
+            if not os.path.exists(chartArrayFinalPath):
+               os.system(f"cp {os.path.join(THIS_SCRIPT_DIR, CHART_ARRAY_PY)} {chartArrayFinalPath}")
+               os.system(f"chmod 777 {chartArrayFinalPath}")
 
             # Start the logging subscriber
             cmd = f'python3 {checkStartScript} --pathToScript {mqttLoggerScript} --argsToScript "-c {subPath}"'
