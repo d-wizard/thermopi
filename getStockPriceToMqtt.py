@@ -11,13 +11,16 @@ import paho.mqtt.publish as publish
 # API Functions
 ################################################################################
 def getCurrentStockPrice(stock):
-   stockPrice = None
    try:
       ticker = yf.Ticker(stock)
-      stockPrice = float(ticker.info['regularMarketPrice'])
+      priceKeysToUseInOrder = ['currentPrice', 'preMarketPrice', 'postMarketPrice', 'regularMarketPrice'] # Keep track of after hours markets.
+      for priceKey in priceKeysToUseInOrder:
+         if priceKey in ticker.info:
+            return float(ticker.info[priceKey])
    except:
       pass
-   return stockPrice
+   return None
+
 
 # Main start
 if __name__== "__main__":
