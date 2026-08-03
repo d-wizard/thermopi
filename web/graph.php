@@ -75,6 +75,55 @@
           $titleStr = "30 Days";
           $updateButtonSubmitName = "submit_30day";
         }
+        if(isset($_GET["submit_2month"]))
+        {
+          $time = 3600*24*31*2;
+          $numPoints = 3000;
+          $titleStr = "2 Months";
+          $updateButtonSubmitName = "submit_2month";
+        }
+        if(isset($_GET["submit_3month"]))
+        {
+          $time = 3600*24*31*3;
+          $numPoints = 3000;
+          $titleStr = "3 Months";
+          $updateButtonSubmitName = "submit_3month";
+        }
+        if(isset($_GET["submit_6month"]))
+        {
+          $time = 3600*24*366/2;
+          $numPoints = 3000;
+          $titleStr = "6 Months";
+          $updateButtonSubmitName = "submit_6month";
+        }
+        if(isset($_GET["submit_1year"]))
+        {
+          $time = 3600*24*366;
+          $numPoints = 3000;
+          $titleStr = "1 year";
+          $updateButtonSubmitName = "submit_1year";
+        }
+        if(isset($_GET["submit_2year"]))
+        {
+          $time = 3600*24*366*2;
+          $numPoints = 3000;
+          $titleStr = "2 years";
+          $updateButtonSubmitName = "submit_2year";
+        }
+        if(isset($_GET["submit_3year"]))
+        {
+          $time = 3600*24*366*3;
+          $numPoints = 3000;
+          $titleStr = "3 years";
+          $updateButtonSubmitName = "submit_3year";
+        }
+        if(isset($_GET["submit_5year"]))
+        {
+          $time = 3600*24*366*5;
+          $numPoints = 3000;
+          $titleStr = "5 years";
+          $updateButtonSubmitName = "submit_5year";
+        }
 
         if(isset($_GET["Topic"]))
         {
@@ -231,6 +280,14 @@
       <input name="submit_3day" type="submit" value="3 Day" />
       <input name="submit_7day" type="submit" value="7 Day" />
       <input name="submit_30day" type="submit" value="30 Day" />
+      <br>
+      <input name="submit_2month" type="submit" value="2 Mn" />
+      <input name="submit_3month" type="submit" value="3 Mn" />
+      <input name="submit_6month" type="submit" value="6 Mn" />
+      <input name="submit_1year" type="submit" value="1 Yr" />
+      <input name="submit_2year" type="submit" value="2 Yr" />
+      <input name="submit_3year" type="submit" value="3 Yr" />
+      <input name="submit_5year" type="submit" value="5 Yr" />
     </form>
     <div id="curve_chart_with_switch"></div>
     </center>
